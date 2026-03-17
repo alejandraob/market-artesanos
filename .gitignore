@@ -1,0 +1,61 @@
+# Dependencias
+node_modules/
+vendor/
+
+# Archivos de entorno
+.env
+.env.*
+!.env.example
+
+# Build / compilados
+dist/
+dist-ssr/
+public/build/
+public/hot/
+public/storage
+
+# Storage de Laravel
+backend/storage/*.key
+backend/storage/app/firebase-credentials.json
+backend/storage/app/public/*
+!backend/storage/app/public/.gitkeep
+backend/storage/framework/cache/data/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/storage/logs/*
+
+# Cache
+*.cache
+.phpunit.cache
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs y editores
+.idea/
+.vscode/
+.fleet/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Laravel
+Homestead.json
+Homestead.yaml
+auth.json
+
+# Package locks raiz (los de cada subcarpeta se mantienen)
+/package-lock.json
+
+# Correo Argentino plugin (vendor externo)
+correoargentino/vendor/

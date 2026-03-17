@@ -1,0 +1,30 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('artisans', function (Blueprint $table) {
+            $table->string('photo')->nullable()->after('location');
+        });
+
+        Schema::table('products', function (Blueprint $table) {
+            $table->boolean('is_active')->default(true)->after('is_featured');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('artisans', function (Blueprint $table) {
+            $table->dropColumn('photo');
+        });
+
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn('is_active');
+        });
+    }
+};
