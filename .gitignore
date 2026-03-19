@@ -2,6 +2,9 @@
 node_modules/
 vendor/
 
+#deploy
+deploy/
+
 # Archivos de entorno
 .env
 .env.*
