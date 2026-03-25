@@ -115,6 +115,9 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import api, { storageUrl } from '../utils/api'
+import { useCartStore } from '../stores/cart'
+
+const cartStore = useCartStore()
 
 const route = useRoute()
 const product = ref(null)
@@ -170,6 +173,7 @@ const addToCart = async () => {
       product_id: product.value.id,
       quantity: quantity.value
     })
+    cartStore.fetchCount()
     cartMessage.value = '¡Agregado al carrito!'
     setTimeout(() => cartMessage.value = '', 3000)
   } catch (error) {

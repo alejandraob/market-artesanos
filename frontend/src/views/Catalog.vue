@@ -46,14 +46,35 @@
 
     <!-- Product Grid Area -->
     <main class="flex-grow">
+      <!-- Buscador -->
+      <div class="mb-8">
+        <div class="relative">
+          <input
+            v-model="searchQuery"
+            @input="onSearchInput"
+            type="text"
+            placeholder="Buscar productos..."
+            class="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-4 outline-none focus:ring-2 focus:ring-artisan-accent/50 focus:border-artisan-accent transition-all text-sm shadow-sm"
+          />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <button v-if="searchQuery" @click="clearSearch" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
       <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-12">
         <div v-for="i in 6" :key="i" class="aspect-[4/5] bg-white animate-pulse rounded-[2.5rem] shadow-sm"></div>
       </div>
 
       <div v-else-if="products.length === 0" class="flex flex-col items-center justify-center py-40 bg-white rounded-[4rem] border border-dashed border-gray-200">
         <div class="text-6xl mb-6">🔍</div>
-        <p class="text-2xl font-black text-artisan-dark">Aún no hay obras aquí</p>
-        <p class="text-gray-400 mt-2">Prueba seleccionando otra categoría</p>
+        <p class="text-2xl font-black text-artisan-dark">No se encontraron productos</p>
+        <p class="text-gray-400 mt-2">{{ searchQuery ? 'Proba con otros terminos de busqueda' : 'Proba seleccionando otra categoria' }}</p>
       </div>
 
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-12">
@@ -83,6 +104,8 @@ const products = ref([])
 const loading = ref(true)
 const selectedCategory = ref(route.query.categoria || null)
 const expandedParents = ref([])
+const searchQuery = ref(route.query.buscar || '')
+let searchTimeout = null
 
 const toggleParent = (id) => {
   const idx = expandedParents.value.indexOf(id)
@@ -98,7 +121,7 @@ const fetchData = async () => {
   try {
     const [catsRes, prodsRes] = await Promise.all([
       api.get('/categories'),
-      api.get(`/products?category_id=${selectedCategory.value || ''}`)
+      api.get(`/products?category_id=${selectedCategory.value || ''}&search=${searchQuery.value || ''}`)
     ])
     categories.value = catsRes.data
     products.value = prodsRes.data.data
@@ -112,6 +135,20 @@ const fetchData = async () => {
 const handleAddToCart = (product) => {
   // Add to cart logic or redirect to detail
   router.push(`/producto/${product.slug}`)
+}
+
+const onSearchInput = () => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    router.push({ query: { ...route.query, buscar: searchQuery.value || undefined } })
+    fetchData()
+  }, 400)
+}
+
+const clearSearch = () => {
+  searchQuery.value = ''
+  router.push({ query: { ...route.query, buscar: undefined } })
+  fetchData()
 }
 
 const setCategory = (id) => {

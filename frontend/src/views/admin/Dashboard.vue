@@ -230,44 +230,174 @@
       <section v-if="activeSection === 'pedidos'">
         <h1 class="text-2xl font-black text-artisan-dark mb-6">Pedidos</h1>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <table class="w-full text-left">
-            <thead class="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase"># Pedido</th>
-                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Fecha</th>
-                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Productos</th>
-                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Total</th>
-                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Envio</th>
-                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Estado</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-              <tr v-for="order in orders" :key="order.id" class="hover:bg-gray-50/50 transition-colors">
-                <td class="px-6 py-4 font-bold text-sm">#{{ order.id }}</td>
-                <td class="px-6 py-4 text-sm text-gray-600">{{ formatDate(order.created_at) }}</td>
-                <td class="px-6 py-4">
-                  <div class="flex flex-col gap-0.5">
-                    <span v-for="item in order.items" :key="item.id" class="text-xs text-gray-500">
-                      {{ item.quantity }}x {{ item.product?.name || 'Producto eliminado' }}
-                    </span>
+        <!-- Filtro por estado -->
+        <div class="flex gap-2 mb-4 flex-wrap">
+          <button
+            v-for="st in ['todos', 'pending', 'paid', 'shipped', 'delivered', 'cancelled']"
+            :key="st"
+            @click="orderFilter = st"
+            class="text-xs font-bold px-3 py-1.5 rounded-full transition-colors"
+            :class="orderFilter === st ? 'bg-artisan-brown text-white' : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'"
+          >{{ st === 'todos' ? 'Todos' : statusLabel(st) }}</button>
+        </div>
+
+        <div class="space-y-4">
+          <div v-for="order in filteredOrders" :key="order.id" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <!-- Header del pedido -->
+            <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50/50 transition-colors" @click="toggleOrderDetail(order.id)">
+              <div class="flex items-center gap-4">
+                <span class="font-black text-sm">#{{ order.id }}</span>
+                <span class="text-sm text-gray-500">{{ formatDate(order.created_at) }}</span>
+                <span class="text-xs font-bold px-2 py-1 rounded-full" :class="statusClass(order.status)">{{ statusLabel(order.status) }}</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="font-bold text-sm">${{ order.total }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 transition-transform" :class="expandedOrder === order.id ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Detalle expandido -->
+            <div v-if="expandedOrder === order.id" class="border-t border-gray-100 px-6 py-5 space-y-5">
+              <!-- Productos -->
+              <div>
+                <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Productos</h4>
+                <div class="space-y-2">
+                  <div v-for="item in order.items" :key="item.id" class="flex items-center gap-3 text-sm">
+                    <img :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/40x40'" class="w-10 h-10 rounded-lg object-cover" />
+                    <span class="flex-1">{{ item.product?.name || 'Producto eliminado' }}</span>
+                    <span class="text-gray-500">x{{ item.quantity }}</span>
+                    <span class="font-bold">${{ item.unit_price }}</span>
                   </div>
-                </td>
-                <td class="px-6 py-4 font-bold text-sm">${{ order.total }}</td>
-                <td class="px-6 py-4 text-xs text-gray-500">{{ order.shipping_tracking || '-' }}</td>
-                <td class="px-6 py-4">
-                  <span class="text-xs font-bold px-2 py-1 rounded-full" :class="statusClass(order.status)">{{ statusLabel(order.status) }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div v-if="orders.length === 0" class="text-center py-12 text-gray-400">
+                </div>
+              </div>
+
+              <!-- Datos de envio -->
+              <div v-if="order.shipping_name" class="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Direccion de envio</h4>
+                  <p class="text-sm text-gray-700">{{ order.shipping_name }}</p>
+                  <p class="text-sm text-gray-700">{{ order.shipping_address }}</p>
+                  <p class="text-sm text-gray-700">{{ order.shipping_city }}, {{ order.shipping_province }}</p>
+                  <p class="text-sm text-gray-700">CP {{ order.shipping_postal_code }}</p>
+                  <p class="text-sm text-gray-700">Tel: {{ order.shipping_phone }}</p>
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Envio</h4>
+                  <p class="text-sm text-gray-700">Costo: ${{ order.shipping_cost }}</p>
+                  <p class="text-sm text-gray-700">Tracking: {{ order.shipping_tracking || 'Sin asignar' }}</p>
+                </div>
+              </div>
+
+              <!-- Cambiar estado -->
+              <div class="bg-gray-50 rounded-xl p-4">
+                <h4 class="text-xs font-bold text-gray-400 uppercase mb-3">Gestionar pedido</h4>
+                <div class="flex flex-wrap items-end gap-4">
+                  <div>
+                    <label class="text-xs font-bold text-gray-500 mb-1 block">Estado</label>
+                    <select v-model="orderStatusEdit[order.id]" class="input-field text-sm py-2 w-48">
+                      <option value="pending">Pendiente</option>
+                      <option value="paid">Pagado</option>
+                      <option value="shipped">Enviado</option>
+                      <option value="delivered">Entregado</option>
+                      <option value="cancelled">Cancelado</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold text-gray-500 mb-1 block">N. de seguimiento</label>
+                    <input v-model="orderTrackingEdit[order.id]" class="input-field text-sm py-2 w-56" placeholder="Ej: MARKET-123" />
+                  </div>
+                  <button
+                    @click="updateOrderStatus(order)"
+                    :disabled="savingOrder === order.id"
+                    class="bg-artisan-brown hover:bg-[#5b3a27] text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50"
+                  >
+                    {{ savingOrder === order.id ? 'Guardando...' : 'Actualizar' }}
+                  </button>
+                </div>
+                <p v-if="orderUpdateMsg === order.id" class="text-green-600 text-xs font-bold mt-2">Estado actualizado correctamente</p>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="filteredOrders.length === 0" class="bg-white rounded-2xl shadow-sm border border-gray-100 text-center py-12 text-gray-400">
             <p class="text-4xl mb-3">🛒</p>
             <p class="font-semibold">No hay pedidos</p>
           </div>
         </div>
       </section>
+
+      <!-- CATEGORIAS -->
+      <section v-if="activeSection === 'categorias'">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-black text-artisan-dark">Categorias</h1>
+          <button @click="openCategoryModal()" class="bg-artisan-brown hover:bg-[#5b3a27] text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors">+ Nueva Categoria</button>
+        </div>
+
+        <div class="space-y-3">
+          <div v-for="cat in categories" :key="cat.id" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="font-bold text-artisan-dark">{{ cat.name }}</span>
+                <span v-if="cat.description" class="text-gray-400 text-sm ml-2">- {{ cat.description }}</span>
+              </div>
+              <div class="flex gap-2">
+                <button @click="openCategoryModal(cat)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">Editar</button>
+                <button @click="deleteCategory(cat.id)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors">Eliminar</button>
+              </div>
+            </div>
+            <!-- Subcategorias -->
+            <div v-if="cat.subcategories?.length" class="mt-3 pl-6 space-y-2">
+              <div v-for="sub in cat.subcategories" :key="sub.id" class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2.5">
+                <div>
+                  <span class="font-semibold text-sm text-gray-700">{{ sub.name }}</span>
+                  <span v-if="sub.description" class="text-gray-400 text-xs ml-2">- {{ sub.description }}</span>
+                </div>
+                <div class="flex gap-2">
+                  <button @click="openCategoryModal(sub, cat.id)" class="text-xs font-bold px-2 py-1 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">Editar</button>
+                  <button @click="deleteCategory(sub.id)" class="text-xs font-bold px-2 py-1 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors">Eliminar</button>
+                </div>
+              </div>
+            </div>
+            <button @click="openCategoryModal(null, cat.id)" class="mt-2 ml-6 text-xs text-artisan-accent font-bold hover:underline">+ Agregar subcategoria</button>
+          </div>
+        </div>
+
+        <div v-if="categories.length === 0" class="bg-white rounded-2xl shadow-sm border border-gray-100 text-center py-12 text-gray-400">
+          <p class="font-semibold">No hay categorias</p>
+        </div>
+      </section>
     </main>
+
+    <!-- MODAL CATEGORIA -->
+    <div v-if="showCategoryModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
+      <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+        <h2 class="text-xl font-black mb-6">{{ editingCategory ? 'Editar Categoria' : 'Nueva Categoria' }}</h2>
+        <form @submit.prevent="saveCategory" class="space-y-4">
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Nombre</label>
+            <input v-model="categoryForm.name" class="input-field" required />
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Descripcion (opcional)</label>
+            <input v-model="categoryForm.description" class="input-field" />
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Categoria padre</label>
+            <select v-model="categoryForm.parent_id" class="input-field">
+              <option :value="null">Ninguna (categoria principal)</option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+            </select>
+          </div>
+          <div v-if="categoryError" class="text-red-500 text-sm font-semibold bg-red-50 p-3 rounded-xl">{{ categoryError }}</div>
+          <div class="flex gap-3 pt-2">
+            <button type="submit" :disabled="savingCategory" class="btn-primary flex-1 py-3">{{ savingCategory ? 'Guardando...' : 'Guardar' }}</button>
+            <button type="button" @click="showCategoryModal = false" class="flex-1 py-3 border-2 border-gray-200 rounded-full font-bold text-gray-500 hover:bg-gray-50 transition-colors">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- MODAL ARTESANO -->
     <div v-if="showArtisanModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
@@ -445,12 +575,106 @@ const productForm = reactive({
   name: '', description: '', price: null, stock: null, category_id: '', artisan_id: ''
 })
 
+// Order management
+const expandedOrder = ref(null)
+const orderFilter = ref('todos')
+const orderStatusEdit = reactive({})
+const orderTrackingEdit = reactive({})
+const savingOrder = ref(null)
+const orderUpdateMsg = ref(null)
+
+const filteredOrders = computed(() => {
+  if (orderFilter.value === 'todos') return orders.value
+  return orders.value.filter(o => o.status === orderFilter.value)
+})
+
+const toggleOrderDetail = (id) => {
+  if (expandedOrder.value === id) {
+    expandedOrder.value = null
+    return
+  }
+  expandedOrder.value = id
+  const order = orders.value.find(o => o.id === id)
+  if (order) {
+    orderStatusEdit[id] = order.status
+    orderTrackingEdit[id] = order.shipping_tracking || ''
+  }
+}
+
+const updateOrderStatus = async (order) => {
+  savingOrder.value = order.id
+  orderUpdateMsg.value = null
+  try {
+    const res = await api.patch(`/orders/${order.id}/status`, {
+      status: orderStatusEdit[order.id],
+      shipping_tracking: orderTrackingEdit[order.id] || null,
+    })
+    order.status = res.data.status
+    order.shipping_tracking = res.data.shipping_tracking
+    orderUpdateMsg.value = order.id
+    setTimeout(() => { if (orderUpdateMsg.value === order.id) orderUpdateMsg.value = null }, 3000)
+  } catch (error) {
+    alert('Error al actualizar el pedido')
+  } finally {
+    savingOrder.value = null
+  }
+}
+
+// Category management
+const showCategoryModal = ref(false)
+const editingCategory = ref(null)
+const savingCategory = ref(false)
+const categoryError = ref('')
+const categoryForm = reactive({ name: '', description: '', parent_id: null })
+
+const openCategoryModal = (cat = null, parentId = null) => {
+  editingCategory.value = cat
+  categoryError.value = ''
+  if (cat) {
+    categoryForm.name = cat.name || ''
+    categoryForm.description = cat.description || ''
+    categoryForm.parent_id = parentId || cat.parent_id || null
+  } else {
+    Object.assign(categoryForm, { name: '', description: '', parent_id: parentId })
+  }
+  showCategoryModal.value = true
+}
+
+const saveCategory = async () => {
+  savingCategory.value = true
+  categoryError.value = ''
+  try {
+    if (editingCategory.value) {
+      await api.put(`/categories/${editingCategory.value.id}`, categoryForm)
+    } else {
+      await api.post('/categories', categoryForm)
+    }
+    showCategoryModal.value = false
+    await fetchAll()
+  } catch (error) {
+    categoryError.value = error.response?.data?.message || 'Error al guardar categoria'
+  } finally {
+    savingCategory.value = false
+  }
+}
+
+const deleteCategory = async (id) => {
+  if (!confirm('¿Seguro que deseas eliminar esta categoria?')) return
+  try {
+    await api.delete(`/categories/${id}`)
+    await fetchAll()
+  } catch (error) {
+    alert(error.response?.data?.message || 'Error al eliminar categoria')
+  }
+}
+
 const menuItems = computed(() => [
   { key: 'resumen', label: 'Resumen', icon: '📊' },
   { key: 'artesanos', label: 'Artesanos', icon: '🧑‍🎨', badge: artisans.value.length || null },
   { key: 'productos', label: 'Productos', icon: '📦', badge: allProducts.value.length || null },
   { key: 'clientes', label: 'Clientes', icon: '👥', badge: clients.value.length || null },
   { key: 'pedidos', label: 'Pedidos', icon: '🛒', badge: orders.value.length || null },
+  { key: 'categorias', label: 'Categorias', icon: '📂', badge: categories.value.length || null },
 ])
 
 const lowStockProducts = computed(() => allProducts.value.filter(p => p.stock <= 5 && p.stock > 0))
@@ -463,7 +687,7 @@ const fetchAll = async () => {
       api.get('/admin/products'),
       api.get('/categories'),
       api.get('/admin/clients'),
-      api.get('/orders'),
+      api.get('/orders?scope=all'),
     ])
     artisans.value = resArt.data
     allProducts.value = resProd.data

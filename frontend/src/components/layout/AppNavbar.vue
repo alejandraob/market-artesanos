@@ -24,11 +24,15 @@
           <router-link to="/nosotros" class="nav-link text-lg font-medium text-gray-700 hover:text-artisan-accent transition-colors">
             Nosotros
           </router-link>
+          <router-link to="/contacto" class="nav-link text-lg font-medium text-gray-700 hover:text-artisan-accent transition-colors">
+            Contacto
+          </router-link>
           
           <router-link to="/carrito" class="relative group p-2 hover:bg-artisan-accent/10 rounded-full transition-colors flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-artisan-brown group-hover:text-artisan-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
+            <span v-if="cartCount > 0" class="absolute -top-1 -right-1 bg-artisan-accent text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow">{{ cartCount }}</span>
           </router-link>
 
           <!-- Authentication Controls -->
@@ -67,14 +71,21 @@
 </template>
 
 <script setup>
+import { computed, onMounted } from 'vue'
 import { useAuthStore } from '../../stores/auth'
+import { useCartStore } from '../../stores/cart'
 import { useRouter } from 'vue-router'
 
 const auth = useAuthStore()
+const cartStore = useCartStore()
 const router = useRouter()
+const cartCount = computed(() => cartStore.count)
+
+onMounted(() => cartStore.fetchCount())
 
 const logout = () => {
   auth.logout()
+  cartStore.clear()
   router.push('/login')
 }
 </script>

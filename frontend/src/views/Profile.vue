@@ -84,8 +84,10 @@
             </div>
           </div>
           <div class="flex justify-between items-center pt-3 border-t border-gray-100">
-            <span v-if="order.shipping_tracking" class="text-xs text-gray-400">Tracking: {{ order.shipping_tracking }}</span>
-            <span v-else class="text-xs text-gray-400">Sin tracking</span>
+            <div>
+              <span v-if="order.shipping_tracking" class="text-xs text-gray-400 block">Tracking: {{ order.shipping_tracking }}</span>
+              <router-link :to="{ name: 'order-confirmation', params: { id: order.id } }" class="text-xs text-artisan-accent font-bold hover:underline">Ver detalle y datos del artesano</router-link>
+            </div>
             <span class="font-black text-lg">${{ order.total }}</span>
           </div>
         </div>

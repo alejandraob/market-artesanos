@@ -8,10 +8,14 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ContactController;
 
 // Public Endpoints
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/contact', [ContactController::class, 'send']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
@@ -54,9 +58,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/admin/clients', [ClientController::class, 'index']);
         Route::get('/admin/clients/{id}', [ClientController::class, 'show']);
+
+        Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus']);
     });
 
     // Client/Order routes
     Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::post('/orders/checkout', [OrderController::class, 'checkout']);
 });

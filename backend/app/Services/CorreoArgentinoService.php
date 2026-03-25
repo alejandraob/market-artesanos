@@ -18,8 +18,8 @@ class CorreoArgentinoService
             ? 'https://apitest.correoargentino.com.ar/paqar/v1'
             : 'https://api.correoargentino.com.ar/paqar/v1';
 
-        $this->apiKey = config('services.correo_argentino.api_key', '');
-        $this->agreement = config('services.correo_argentino.agreement', '');
+        $this->apiKey = (string) config('services.correo_argentino.api_key', '');
+        $this->agreement = (string) config('services.correo_argentino.agreement', '');
         $this->verifySSL = config('services.correo_argentino.verify_ssl', true);
     }
 

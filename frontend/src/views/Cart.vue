@@ -51,6 +51,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import api, { storageUrl } from '../utils/api'
+import { useCartStore } from '../stores/cart'
+
+const cartStore = useCartStore()
 
 const cartItems = ref([])
 const loading = ref(true)
@@ -76,6 +79,7 @@ const updateQuantity = async (item, delta) => {
   try {
     await api.put(`/cart/${item.id}`, { quantity: newQty })
     item.quantity = newQty
+    cartStore.fetchCount()
   } catch (error) {
     console.error('Error updating quantity', error)
   }
@@ -85,6 +89,7 @@ const removeItem = async (id) => {
   try {
     await api.delete(`/cart/${id}`)
     cartItems.value = cartItems.value.filter(i => i.id !== id)
+    cartStore.fetchCount()
   } catch (error) {
     console.error('Error removing item', error)
   }
