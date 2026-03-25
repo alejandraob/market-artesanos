@@ -67,15 +67,45 @@
         </div>
       </div>
 
-      <!-- Aviso de envio -->
-      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mt-4 flex items-start gap-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <div>
-          <p class="font-bold text-amber-800 text-sm">Informacion sobre el envio</p>
-          <p class="text-amber-700 text-sm mt-1">Una vez efectuada la compra, el producto sera elaborado y enviado en un plazo de <strong>15 a 20 dias habiles</strong>.</p>
+      <!-- Calcular envío -->
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mt-4">
+        <div class="flex items-start gap-4 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p class="font-bold text-amber-800 text-sm">Calcular costo de envio</p>
+            <p class="text-amber-700 text-sm mt-1">Ingresa tu codigo postal para conocer el costo del envio via Correo Argentino.</p>
+          </div>
         </div>
+        <div class="flex gap-3">
+          <input
+            v-model="postalCode"
+            type="text"
+            placeholder="Ej: 1414"
+            maxlength="8"
+            class="flex-grow px-4 py-3 border border-amber-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm"
+            @keyup.enter="calcularEnvio"
+          />
+          <button
+            @click="calcularEnvio"
+            :disabled="calculandoEnvio || !postalCode"
+            class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors disabled:opacity-50"
+          >
+            {{ calculandoEnvio ? 'Calculando...' : 'Calcular' }}
+          </button>
+        </div>
+        <div v-if="shippingRates" class="mt-4 space-y-2">
+          <div v-for="(rate, idx) in shippingRates" :key="idx" class="bg-white border border-amber-200 rounded-xl p-3 flex justify-between items-center">
+            <div>
+              <p class="font-bold text-sm text-artisan-dark">{{ rate.serviceDescription || rate.serviceType }}</p>
+              <p v-if="rate.deliveryTime" class="text-xs text-gray-500">Entrega estimada: {{ rate.deliveryTime }} dias habiles</p>
+            </div>
+            <span class="font-black text-lg text-amber-700">${{ rate.price || rate.total }}</span>
+          </div>
+        </div>
+        <p v-if="shippingError" class="mt-3 text-red-600 text-sm font-medium">{{ shippingError }}</p>
+        <p class="text-amber-700 text-xs mt-3">Una vez efectuada la compra, el producto sera elaborado y enviado en un plazo de <strong>15 a 20 dias habiles</strong>.</p>
       </div>
     </div>
   </div>
@@ -93,6 +123,10 @@ const activeImage = ref('https://placehold.co/800x800?text=Artesanía')
 const quantity = ref(1)
 const isAdding = ref(false)
 const cartMessage = ref('')
+const postalCode = ref('')
+const calculandoEnvio = ref(false)
+const shippingRates = ref(null)
+const shippingError = ref('')
 
 onMounted(async () => {
   try {
@@ -107,6 +141,27 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+const calcularEnvio = async () => {
+  if (!postalCode.value) return
+  calculandoEnvio.value = true
+  shippingRates.value = null
+  shippingError.value = ''
+  try {
+    const res = await api.post('/shipping-rates', {
+      postal_code: postalCode.value,
+      product_id: product.value.id
+    })
+    shippingRates.value = res.data
+    if (!res.data || res.data.length === 0) {
+      shippingError.value = 'No se encontraron opciones de envio para ese codigo postal.'
+    }
+  } catch (error) {
+    shippingError.value = 'No se pudo calcular el envio. Verifica el codigo postal e intenta nuevamente.'
+  } finally {
+    calculandoEnvio.value = false
+  }
+}
 
 const addToCart = async () => {
   isAdding.value = true

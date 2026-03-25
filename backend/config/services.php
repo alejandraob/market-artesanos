@@ -33,9 +33,8 @@ return [
 
     'correo_argentino' => [
         'sandbox' => env('CORREO_ARGENTINO_SANDBOX', true),
-        'username' => env('CORREO_ARGENTINO_USERNAME'),
-        'password' => env('CORREO_ARGENTINO_PASSWORD'),
-        'customer_id' => env('CORREO_ARGENTINO_CUSTOMER_ID'),
+        'api_key' => env('CORREO_ARGENTINO_API_KEY'),
+        'agreement' => env('CORREO_ARGENTINO_AGREEMENT'),
         'origin_zip' => env('CORREO_ARGENTINO_ORIGIN_ZIP', '8307'),
         'verify_ssl' => env('CORREO_ARGENTINO_VERIFY_SSL', true),
     ],

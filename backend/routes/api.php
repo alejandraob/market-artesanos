@@ -21,6 +21,7 @@ Route::get('/artisans/{id}', [ArtisanController::class, 'show']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{identifier}', [ProductController::class, 'show']);
+Route::post('/shipping-rates', [ProductController::class, 'shippingRates']);
 
 // Cart endpoints (auth optional)
 Route::get('/cart', [CartController::class, 'index']);
@@ -58,5 +59,4 @@ Route::middleware('auth:sanctum')->group(function () {
     // Client/Order routes
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders/checkout', [OrderController::class, 'checkout']);
-    Route::post('/shipping-rates', [OrderController::class, 'getShippingRates']);
 });
