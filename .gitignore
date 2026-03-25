@@ -62,3 +62,6 @@ auth.json
 
 # Correo Argentino plugin (vendor externo)
 correoargentino/vendor/
+
+# Base de datos
+/market_artesanos.sql
