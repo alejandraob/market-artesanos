@@ -12,7 +12,7 @@
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       <div v-for="item in wishlist.items" :key="item.id" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group">
         <router-link :to="`/producto/${item.product?.slug}`" class="block">
-          <img :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/400x300'" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
+          <img :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/400x300'" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
         </router-link>
         <div class="p-5">
           <router-link :to="`/producto/${item.product?.slug}`">

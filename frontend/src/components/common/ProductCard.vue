@@ -1,10 +1,12 @@
 <template>
   <div class="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full relative">
     <div class="relative aspect-[4/5] overflow-hidden">
-      <img 
-        :src="product.images ? storageUrl(product.images[0]) : 'https://placehold.co/400x500?text=Artesanía'" 
+      <img
+        :src="product.images ? storageUrl(product.images[0]) : 'https://placehold.co/400x500?text=Artesanía'"
         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
         :alt="product.name"
+        loading="lazy"
+        decoding="async"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-artisan-dark/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
          <router-link 

@@ -6,7 +6,7 @@
     <!-- Image Gallery -->
     <div class="space-y-4">
       <div class="aspect-square bg-white rounded-3xl overflow-hidden shadow-inner border border-gray-100 flex items-center justify-center p-8 relative">
-        <img :src="activeImage" :alt="product.name" class="w-full h-full object-contain" />
+        <img :src="activeImage" :alt="product.name" class="w-full h-full object-contain" decoding="async" />
         <div class="absolute bottom-4 left-4 right-4 bg-artisan-brown/80 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2 rounded-xl text-center">
           Imagen ilustrativa de muestra - El producto final se elabora a pedido
         </div>
@@ -19,7 +19,7 @@
           class="w-20 h-20 rounded-xl border-2 flex-shrink-0 overflow-hidden"
           :class="activeImage === storageUrl(img) ? 'border-artisan-accent' : 'border-transparent'"
         >
-          <img :src="storageUrl(img)" class="w-full h-full object-cover" />
+          <img :src="storageUrl(img)" class="w-full h-full object-cover" loading="lazy" decoding="async" />
         </button>
       </div>
     </div>

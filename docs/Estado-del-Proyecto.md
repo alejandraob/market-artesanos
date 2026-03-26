@@ -276,7 +276,7 @@ Estos items son opcionales pero aportan valor al negocio.
 |---|---------|-------------|
 | 1 | Sistema de resenas/valoraciones | Permitir a clientes dejar opiniones y puntuaciones de productos |
 | 2 | Lista de deseos (wishlist) | Guardar productos favoritos para comprar despues |
-| 3 | Cupones y descuentos | Sistema de codigos de descuento aplicables en el checkout |
+| 3 | ~~Cupones y descuentos~~ | DESCARTADO - La asociacion decidio no implementar este sistema |
 | 4 | FAQ / Preguntas frecuentes | Pagina con respuestas a dudas comunes (tiempos, personalizacion, envios, etc.) |
 | 5 | Notificaciones push (Firebase) | El campo `firebase_token` y el paquete ya existen. Falta implementar |
 | 6 | SEO basico | Meta tags dinamicos, sitemap.xml, Open Graph tags para redes sociales |

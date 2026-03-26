@@ -67,6 +67,8 @@
                 :src="storageUrl(artisan.photo)"
                 :alt="artisan.user?.name"
                 class="w-full h-full object-cover rounded-full"
+                loading="lazy"
+                decoding="async"
               />
               <span v-else class="text-5xl font-black text-artisan-brown">{{ artisan.user?.name?.charAt(0) || '?' }}</span>
             </div>
@@ -91,7 +93,7 @@
                   @click="openLightbox(img)"
                   class="flex-shrink-0 snap-start w-28 h-28 rounded-xl overflow-hidden border-2 border-transparent hover:border-artisan-accent transition-all shadow-sm hover:shadow-lg cursor-pointer"
                 >
-                  <img :src="storageUrl(img)" class="w-full h-full object-cover" />
+                  <img :src="storageUrl(img)" class="w-full h-full object-cover" loading="lazy" decoding="async" />
                 </button>
               </div>
               <!-- Scroll indicator dots -->

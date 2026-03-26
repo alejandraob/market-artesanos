@@ -89,6 +89,7 @@
               <img
                 :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/40x40?text=...'"
                 class="w-10 h-10 rounded-lg object-cover"
+                loading="lazy" decoding="async"
               />
               <span class="flex-1">{{ item.product?.name || 'Producto eliminado' }}</span>
               <span class="text-gray-500">x{{ item.quantity }}</span>

@@ -93,6 +93,7 @@
             <img
               :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/50x50'"
               class="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+              loading="lazy" decoding="async"
             />
             <div class="flex-grow">
               <p class="font-semibold text-sm">{{ item.product?.name }}</p>

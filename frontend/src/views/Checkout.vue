@@ -158,7 +158,7 @@
 
           <div class="space-y-4 mb-6">
             <div v-for="item in cartItems" :key="item.id" class="flex gap-3">
-              <img :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/60x60'" class="w-14 h-14 object-cover rounded-lg flex-shrink-0" />
+              <img :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/60x60'" class="w-14 h-14 object-cover rounded-lg flex-shrink-0" loading="lazy" decoding="async" />
               <div class="flex-grow min-w-0">
                 <p class="font-semibold text-sm truncate">{{ item.product?.name }}</p>
                 <p class="text-xs text-gray-500">Por {{ item.product?.artisan?.user?.name }}</p>

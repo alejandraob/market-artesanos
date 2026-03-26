@@ -242,7 +242,7 @@ Pagina `/preguntas-frecuentes` con 11 preguntas en acordeon expandible. Temas: p
 
 ### 3.5 Cupones y descuentos
 
-**Estado:** Pendiente (requiere definicion de reglas de negocio)
+**Estado:** DESCARTADO - La asociacion decidio no implementar sistema de cupones ni descuentos.
 
 ### 3.6 Compartir producto en redes (COMPLETADO - 26/03/2026)
 
@@ -267,9 +267,14 @@ Componente `PasswordInput.vue` reutilizable con toggle mostrar/ocultar. Aplicado
 - Estilos por tipo: verde (success), rojo (error), marron (info)
 - Reemplazados todos los `alert()` de Dashboard.vue y ProductDetail.vue
 
-### 3.11 Imagenes optimizadas
+### 3.11 Imagenes optimizadas (COMPLETADO - 26/03/2026)
 
-**Estado:** Pendiente
+- `loading="lazy"` en todas las imagenes dinamicas (productos, artesanos, items de pedido, wishlist, galeria)
+- `decoding="async"` para no bloquear el rendering del navegador
+- No se aplica lazy loading a imagenes above-the-fold (logo, hero) para no afectar el LCP
+- Nota: la conversion a WebP y generacion de thumbnails requeriria modificar el backend de upload (Intervention Image). Se puede agregar en el futuro.
+
+**Archivos modificados:** `ProductCard.vue`, `ProductDetail.vue`, `Cart.vue`, `Checkout.vue`, `Wishlist.vue`, `OrderConfirmation.vue`, `Profile.vue`, `Nosotros.vue`
 
 ---
 
