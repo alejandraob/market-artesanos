@@ -92,6 +92,7 @@
           <div v-for="item in order.items" :key="item.id" class="flex items-center gap-4">
             <img
               :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/50x50'"
+              :alt="item.product?.name"
               class="w-12 h-12 rounded-lg object-cover flex-shrink-0"
               loading="lazy" decoding="async"
             />

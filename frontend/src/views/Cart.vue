@@ -13,7 +13,7 @@
 
     <div v-else class="space-y-6">
       <div v-for="item in cartItems" :key="item.id" class="bg-white rounded-lg shadow p-6 flex items-center gap-6">
-        <img :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/100x100'" class="w-24 h-24 object-cover rounded" loading="lazy" decoding="async" />
+        <img :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/100x100'" :alt="item.product?.name" class="w-24 h-24 object-cover rounded" loading="lazy" decoding="async" />
         <div class="flex-grow">
           <h3 class="font-bold text-lg">{{ item.product?.name }}</h3>
           <p class="text-gray-500">Por {{ item.product?.artisan?.user?.name }}</p>

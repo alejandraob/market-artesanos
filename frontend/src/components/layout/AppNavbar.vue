@@ -7,7 +7,7 @@
         <div class="flex-shrink-0 flex items-center group cursor-pointer z-50">
           <router-link to="/" class="flex items-center gap-4 outline-none">
             <div class="relative w-16 h-16 md:w-20 md:h-20 flex justify-center items-center drop-shadow-md group-hover:scale-110 transition-transform duration-500 ease-in-out">
-               <img src="/logo-sinfondo.png" alt="Asociación de Artesanos Logo" class="h-full w-auto object-contain" />
+               <img src="/logo-sinfondo.png" alt="Asociacion de Artesanos" class="h-full w-auto object-contain" width="80" height="73" fetchpriority="high" />
             </div>
             <div class="hidden md:flex flex-col">
               <span class="font-extrabold text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-br from-artisan-brown to-artisan-green tracking-tight leading-none group-hover:from-artisan-accent group-hover:to-artisan-brown transition-all duration-500">Asociación de</span>
@@ -28,7 +28,7 @@
             Contacto
           </router-link>
           
-          <router-link to="/carrito" class="relative group p-2 hover:bg-artisan-accent/10 rounded-full transition-colors flex items-center justify-center">
+          <router-link to="/carrito" aria-label="Carrito de compras" class="relative group p-2 hover:bg-artisan-accent/10 rounded-full transition-colors flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-artisan-brown group-hover:text-artisan-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>

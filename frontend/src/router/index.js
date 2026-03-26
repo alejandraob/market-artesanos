@@ -31,21 +31,20 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   const token = localStorage.getItem('token')
   const user = JSON.parse(localStorage.getItem('user') || 'null')
 
   if (to.meta.requiresAuth && !token) {
-    return next({ name: 'login' })
+    return { name: 'login' }
   }
 
   if (to.meta.roles && user && !to.meta.roles.includes(user.role)) {
-    // Admin siempre tiene acceso
-    if (user.role === 'admin') return next()
-    return next({ name: 'home' })
+    if (user.role === 'admin') return true
+    return { name: 'home' }
   }
 
-  next()
+  return true
 })
 
 router.afterEach((to) => {

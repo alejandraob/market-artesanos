@@ -5,18 +5,18 @@
       <!-- Fila superior: Logo + redes -->
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 pb-10 border-b border-white/10">
         <div class="flex items-center gap-4">
-          <img src="/logo-sinfondo.png" class="h-14 w-auto invert brightness-0" alt="Logo" />
+          <img src="/logo-sinfondo.png" class="h-14 w-auto invert brightness-0" alt="Logo Asociacion de Artesanos" width="56" height="56" />
           <div>
             <span class="text-2xl font-bold tracking-tight block">Asociacion de Artesanos</span>
-            <span class="text-sm text-gray-400">Catriel, Rio Negro</span>
+            <span class="text-sm text-gray-300">Catriel, Rio Negro</span>
           </div>
         </div>
         <div class="flex items-center gap-4">
-          <a href="https://www.facebook.com/share/1DnUUAh8ye/" target="_blank" rel="noopener" class="w-11 h-11 bg-white/10 rounded-xl flex items-center justify-center hover:bg-artisan-accent transition-colors group">
-            <svg class="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <a href="https://www.facebook.com/share/1DnUUAh8ye/" target="_blank" rel="noopener" aria-label="Facebook" class="w-11 h-11 bg-white/10 rounded-xl flex items-center justify-center hover:bg-artisan-accent transition-colors group">
+            <svg class="h-5 w-5 text-gray-300 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
           </a>
-          <a href="https://www.instagram.com/asociacionartesanoscatriel?igsh=MXc2bm13ZjdhNjl5Yg==" target="_blank" rel="noopener" class="w-11 h-11 bg-white/10 rounded-xl flex items-center justify-center hover:bg-artisan-accent transition-colors group">
-            <svg class="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          <a href="https://www.instagram.com/asociacionartesanoscatriel?igsh=MXc2bm13ZjdhNjl5Yg==" target="_blank" rel="noopener" aria-label="Instagram" class="w-11 h-11 bg-white/10 rounded-xl flex items-center justify-center hover:bg-artisan-accent transition-colors group">
+            <svg class="h-5 w-5 text-gray-300 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
           </a>
         </div>
       </div>
@@ -24,8 +24,8 @@
       <!-- Fila inferior: Links -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
         <div>
-          <h4 class="text-sm font-bold mb-4 text-artisan-accent uppercase tracking-wider">Explorar</h4>
-          <ul class="space-y-3 text-gray-400 text-sm">
+          <p class="text-sm font-bold mb-4 text-artisan-accent uppercase tracking-wider">Explorar</p>
+          <ul class="space-y-3 text-gray-300 text-sm">
             <li><router-link to="/catalogo" class="hover:text-white transition-colors">Catalogo</router-link></li>
             <li><router-link to="/nosotros" class="hover:text-white transition-colors">Nosotros</router-link></li>
             <li><router-link to="/contacto" class="hover:text-white transition-colors">Contacto</router-link></li>
@@ -33,16 +33,16 @@
           </ul>
         </div>
         <div>
-          <h4 class="text-sm font-bold mb-4 text-artisan-accent uppercase tracking-wider">Legal</h4>
-          <ul class="space-y-3 text-gray-400 text-sm">
+          <p class="text-sm font-bold mb-4 text-artisan-accent uppercase tracking-wider">Legal</p>
+          <ul class="space-y-3 text-gray-300 text-sm">
             <li><router-link to="/terminos-y-condiciones" class="hover:text-white transition-colors">Terminos y Condiciones</router-link></li>
             <li><router-link to="/politica-de-privacidad" class="hover:text-white transition-colors">Politica de Privacidad</router-link></li>
             <li><router-link to="/politica-de-devoluciones" class="hover:text-white transition-colors">Devoluciones y Cambios</router-link></li>
           </ul>
         </div>
         <div class="sm:col-span-2 lg:col-span-2">
-          <h4 class="text-sm font-bold mb-4 text-artisan-accent uppercase tracking-wider">Contacto</h4>
-          <ul class="space-y-3 text-gray-400 text-sm">
+          <p class="text-sm font-bold mb-4 text-artisan-accent uppercase tracking-wider">Contacto</p>
+          <ul class="space-y-3 text-gray-300 text-sm">
             <li class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-artisan-accent shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
               Catriel, Rio Negro, Argentina

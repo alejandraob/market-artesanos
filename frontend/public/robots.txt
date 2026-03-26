@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://artesanoscatriel.com/sitemap.xml

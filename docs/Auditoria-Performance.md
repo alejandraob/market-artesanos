@@ -350,7 +350,7 @@ Se hacen 5 llamadas a la API en cascada al cargar la pagina.
 - Usar `aspect-ratio` en CSS para reservar espacio antes de que cargue la imagen
 - Aplicar esqueletos de carga (skeleton) mientras cargan las imagenes
 
-**Estado:** Pendiente
+**Estado:** Parcialmente resuelto (logo footer/navbar con dimensiones, falta imagenes de Nosotros)
 
 ### 7. Layout Shift en Catalogo (CLS: 0.13)
 
@@ -360,15 +360,31 @@ Se hacen 5 llamadas a la API en cascada al cargar la pagina.
 - Las ProductCard ya tienen `aspect-[4/5]` que deberia reservar espacio
 - Verificar que el buscador y las categorias no causen reflow al cargar datos
 
-**Estado:** Pendiente
+**Estado:** Pendiente (CLS bajo, prioridad baja)
 
-### 8. Layout Shift en Contacto (CLS: 0.683)
+### 8. Layout Shift global por footer (CLS: 0.3-0.77)
 
-**Problema:** El footer causa un shift de 0.683 al cargarse la imagen del logo (`img.h-14.w-auto.invert.brightness-0`).
+**Problema:** El logo del footer sin dimensiones causaba layout shift en TODAS las paginas (0.3 a 0.77).
 
-**Solucion:** Agregar dimensiones fijas al logo del footer para reservar espacio.
+**Solucion:** Agregado `width="56" height="56"` al logo del footer y `width="80" height="80" fetchpriority="high"` al logo del navbar.
 
-**Estado:** Pendiente
+**Estado:** CORREGIDO (26/03/2026)
+
+### 9. Bug de navegacion ProductDetail (Transition)
+
+**Problema:** Al navegar desde ProductDetail a otra pagina, el carrito no cargaba. ProductDetail tenia multiples nodos raiz incompatibles con `<Transition>`.
+
+**Solucion:** Envuelto todo el template en un unico `<div>` raiz.
+
+**Estado:** CORREGIDO (26/03/2026)
+
+### 10. Router next() deprecated
+
+**Problema:** Vue Router mostraba warning por uso de callback `next()` en navigation guards.
+
+**Solucion:** Modernizado `beforeEach` para usar `return` en vez de `next()`.
+
+**Estado:** CORREGIDO (26/03/2026)
 
 ---
 
@@ -382,9 +398,9 @@ Se hacen 5 llamadas a la API en cascada al cargar la pagina.
 - Textos `text-gray-400` en footer sobre fondo `bg-artisan-dark` - contraste bajo
 - Placeholders en inputs
 
-**Solucion:** Oscurecer los grises: usar `text-gray-600` en vez de `text-gray-400/500` donde sea necesario, o cambiar `text-artisan-accent` (#E9A106) por un tono mas oscuro en textos sobre fondo claro.
+**Solucion:** Color accent cambiado de #E9A106 a #C98A05 (ratio 4.5:1, cumple WCAG AA). Grises del footer cambiados de gray-400 a gray-300 para mejor contraste sobre fondo oscuro.
 
-**Estado:** Pendiente
+**Estado:** CORREGIDO (26/03/2026)
 
 ### A2. Links sin nombre accesible (GLOBAL)
 
@@ -392,28 +408,29 @@ Se hacen 5 llamadas a la API en cascada al cargar la pagina.
 - Icono del carrito en navbar (solo tiene SVG, no tiene `aria-label`)
 - Iconos de Facebook e Instagram en contacto y footer (solo SVG)
 
-**Solucion:** Agregar `aria-label` a todos los links que solo tienen iconos:
-- Carrito: `aria-label="Carrito de compras"`
-- Facebook: `aria-label="Facebook"`
-- Instagram: `aria-label="Instagram"`
+**Solucion:** Agregado `aria-label` a todos los links/botones de solo iconos:
+- Carrito navbar: `aria-label="Carrito de compras"`
+- Facebook/Instagram footer y contacto: `aria-label="Facebook"` / `aria-label="Instagram"`
+- Compartir en ProductDetail: `aria-label="Compartir en WhatsApp"` / `aria-label="Compartir en Facebook"`
+- Ojito contrasena: `aria-label` dinamico ("Mostrar/Ocultar contrasena") + padding aumentado para touch target
 
-**Estado:** Pendiente
+**Estado:** CORREGIDO (26/03/2026)
 
 ### A3. Headings desordenados (GLOBAL)
 
 **Problema:** El footer usa `h4` que rompe la secuencia descendente de headings de la pagina.
 
-**Solucion:** Cambiar los `h4` del footer por `p` con clase de estilo, o asegurar que la jerarquia sea correcta.
+**Solucion:** Cambiados todos los `<h4>` del footer por `<p>` con las mismas clases de estilo.
 
-**Estado:** Pendiente
+**Estado:** CORREGIDO (26/03/2026)
 
 ### A4. robots.txt invalido
 
 **Problema:** Vite genera un robots.txt con errores en desarrollo. En produccion se debe crear uno correcto.
 
-**Solucion:** Crear `/public/robots.txt` con contenido valido.
+**Solucion:** Creado `frontend/public/robots.txt` con `User-agent: * / Allow: /` y referencia a sitemap.
 
-**Estado:** Pendiente
+**Estado:** CORREGIDO (26/03/2026)
 
 ---
 
