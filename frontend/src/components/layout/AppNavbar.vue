@@ -81,7 +81,9 @@ const cartStore = useCartStore()
 const router = useRouter()
 const cartCount = computed(() => cartStore.count)
 
-onMounted(() => cartStore.fetchCount())
+onMounted(() => {
+  if (!cartStore.loaded) cartStore.fetchCart()
+})
 
 const logout = () => {
   auth.logout()

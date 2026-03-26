@@ -661,13 +661,18 @@ const saveCategory = async () => {
   }
 }
 
+const deletingCategory = ref(false)
 const deleteCategory = async (id) => {
+  if (deletingCategory.value) return
   if (!confirm('¿Seguro que deseas eliminar esta categoria?')) return
+  deletingCategory.value = true
   try {
     await api.delete(`/categories/${id}`)
     await fetchAll()
   } catch (error) {
     toastStore.error(error.response?.data?.message || 'Error al eliminar categoria')
+  } finally {
+    deletingCategory.value = false
   }
 }
 
@@ -770,13 +775,18 @@ const saveArtisan = async () => {
   }
 }
 
+const deletingItem = ref(false)
 const deleteArtisan = async (id) => {
+  if (deletingItem.value) return
   if (!confirm('¿Seguro que deseas eliminar este artesano? Se eliminaran tambien sus productos.')) return
+  deletingItem.value = true
   try {
     await api.delete(`/artisans/${id}`)
     await fetchAll()
   } catch (error) {
     toastStore.error('Error al eliminar artesano')
+  } finally {
+    deletingItem.value = false
   }
 }
 
@@ -849,12 +859,16 @@ const toggleProductActive = async (prod) => {
 }
 
 const deleteProduct = async (id) => {
+  if (deletingItem.value) return
   if (!confirm('¿Seguro que deseas eliminar este producto?')) return
+  deletingItem.value = true
   try {
     await api.delete(`/products/${id}`)
     await fetchAll()
   } catch (error) {
     toastStore.error('Error al eliminar producto')
+  } finally {
+    deletingItem.value = false
   }
 }
 

@@ -21,7 +21,7 @@
       </div>
       <div class="relative group">
         <div class="absolute -inset-4 bg-artisan-accent/10 rounded-3xl group-hover:bg-artisan-accent/20 transition-all duration-500 blur-xl"></div>
-        <img src="/asociacion-artesanos.jpg" alt="Asociación de Artesanos de Catriel" class="relative rounded-3xl shadow-2xl object-cover h-96 w-full" />
+        <img src="/asociacion-artesanos.webp" alt="Asociacion de Artesanos de Catriel" class="relative rounded-3xl shadow-2xl object-cover h-96 w-full" width="800" height="384" />
       </div>
     </div>
 

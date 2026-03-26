@@ -521,8 +521,12 @@ Problemas resueltos:
 3. ~~**Accesibilidad**~~ - RESUELTO: aria-labels, alt, contraste, headings (promedio 79->92)
 4. ~~**SEO**~~ - RESUELTO: meta tags, titulos, robots.txt (100 en casi todas)
 
+Problemas resueltos (ronda 2):
+5. ~~**Imagenes estaticas**~~ - RESUELTO: logo (-84%), manos (-55%), asociacion (-8%) convertidas a WebP
+6. ~~**Doble request /api/cart**~~ - RESUELTO: cart store centralizado, navbar solo carga si no loaded
+7. ~~**Doble click en eliminar**~~ - RESUELTO: flag deletingItem/deletingCategory previene doble ejecucion
+
 Problemas pendientes para produccion:
-1. **Imagenes estaticas** (logo, hero, asociacion) - convertir a WebP manualmente
-2. **Doble request /api/cart** - optimizar con store compartido
-3. **Cache headers** - configurar en servidor web
-4. **CLS navegacion SPA** - los shifts al cambiar pagina son inherentes a SPA sin SSR
+1. **Cache headers** - configurar en servidor web (nginx/apache)
+2. **CLS navegacion SPA** - shifts al cambiar pagina son inherentes a SPA sin SSR
+3. **Categories se recarga** en cada visita al catalogo - cache con TTL en Pinia (mejora futura)
