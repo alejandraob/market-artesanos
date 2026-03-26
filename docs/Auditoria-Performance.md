@@ -45,6 +45,227 @@ Auditoria realizada el 26/03/2026 con Google Lighthouse sobre `http://localhost:
 | CLS | 0.767 | Rojo |
 | Speed Index | 1.6s | Naranja |
 
+### Contacto (`/contacto`)
+| Metrica | Valor | Score |
+|---------|-------|-------|
+| Performance | **61** | Naranja |
+| Accessibility | 89 | Naranja |
+| Best Practices | 100 | Verde |
+| SEO | 92 | Verde |
+| FCP | 1.5s | Naranja |
+| LCP | 2.0s | Naranja |
+| TBT | 0ms | Verde |
+| CLS | 0.683 | Rojo |
+| Speed Index | 1.5s | Naranja |
+
+### Pedido Confirmado (`/pedido-confirmado/:id`)
+| Metrica | Valor | Score |
+|---------|-------|-------|
+| Performance | **54** | Naranja |
+| Accessibility | 71 | Naranja |
+| Best Practices | 96 | Verde |
+| SEO | 83 | Naranja |
+| FCP | 1.6s | Naranja |
+| LCP | 3.0s | Rojo |
+| TBT | 30ms | Verde |
+| CLS | 0.589 | Rojo |
+| Speed Index | 1.6s | Naranja |
+
+**Problemas especificos de Pedido Confirmado:**
+- Imagenes de productos sin `alt`
+- Contraste: fecha en text-green-600, telefonos y emails de artesanos en text-artisan-accent, "Productos en tu pedido" en text-gray-400
+- CLS 0.589 por footer
+- Network payload: 2,860 KiB (imagenes sin cache)
+
+### Checkout (`/checkout`)
+| Metrica | Valor | Score |
+|---------|-------|-------|
+| Performance | **53** | Naranja |
+| Accessibility | 70 | Naranja |
+| Best Practices | 96 | Verde |
+| SEO | 83 | Naranja |
+| FCP | 1.6s | Naranja |
+| LCP | 3.3s | Rojo |
+| TBT | 10ms | Verde |
+| CLS | 0.589 | Rojo |
+| Speed Index | 1.6s | Naranja |
+
+**Problemas especificos de Checkout:**
+- Imagenes de productos sin `alt` en resumen del pedido
+- Select de provincia sin label asociado
+- Doble llamada a `/api/cart` (navbar + checkout)
+- Contraste: textos gray-400 (por calcular, cantidades x1, "Calcula el envio...", "Volver al carrito" en text-artisan-accent)
+- Network payload total: 2,909 KiB (imagenes de productos sin cache)
+- CLS 0.589 por footer
+
+### Carrito (`/carrito`)
+| Metrica | Valor | Score |
+|---------|-------|-------|
+| Performance | **64** | Naranja |
+| Accessibility | 82 | Naranja |
+| Best Practices | 96 | Verde |
+| SEO | 83 | Naranja |
+| FCP | 1.5s | Naranja |
+| LCP | 2.9s | Rojo |
+| TBT | 0ms | Verde |
+| CLS | 0.264 | Rojo |
+| Speed Index | 1.5s | Naranja |
+
+**Problemas especificos de Carrito:**
+- Imagenes de productos sin `alt` attribute
+- Imagenes enormes para thumbnails: 837 KiB (1229x1230) mostrada a 96px, 444 KiB (1281x1280) mostrada a 96px. Total 1,282 KiB sin cache.
+- Contraste: precios en text-artisan-accent, boton "Eliminar" en text-red-500
+- Headings desordenados: h3 para nombre producto despues de h1
+- CLS 0.264 por footer
+- Doble llamada a `/api/cart` (navbar + pagina)
+- robots.txt invalido
+
+**Bug encontrado:** Al navegar desde el detalle del producto al carrito via navbar, la pagina no carga. Errores en consola:
+- `[Vue warn]: Component inside <Transition> renders non-element root node` - ProductDetail.vue tiene multiples nodos raiz que no son compatibles con `<Transition>`
+- Se necesita recargar la pagina (F5) para que funcione
+
+### Detalle de Producto (`/producto/:slug`)
+| Metrica | Valor | Score |
+|---------|-------|-------|
+| Performance | **35** | Rojo |
+| Accessibility | 70 | Naranja |
+| Best Practices | 96 | Verde |
+| SEO | 83 | Naranja |
+| FCP | 4.6s | Rojo |
+| LCP | 6.2s | Rojo |
+| TBT | 10ms | Verde |
+| CLS | 0.554 | Rojo |
+| Speed Index | 4.6s | Rojo |
+
+**Problemas especificos de Detalle Producto:**
+- LCP 6.2s: la imagen del producto pesa 444 KiB (1281x1920) mostrada a 185x278. Sin cache, sin WebP. Es el LCP element.
+- Imagen del producto necesita `fetchpriority="high"` (es el LCP)
+- Thumbnails de galeria sin `alt` attribute
+- Botones de thumbnails sin nombre accesible
+- Botones compartir (WhatsApp, Facebook) sin `aria-label`
+- Contraste: "Por Atencio Carla" (text-artisan-accent), "COMPARTIR:" (gray-400), "Aun no hay resenas" (gray-400)
+- CLS 0.554 por footer
+- robots.txt: Vite sirve el index.html como robots.txt (22 errores). Necesita archivo real en `/public/robots.txt`
+- SEO 83: falta meta description dinamica por producto
+
+### Terminos y Condiciones (`/terminos-y-condiciones`)
+| Metrica | Valor | Score |
+|---------|-------|-------|
+| Performance | **61** | Naranja |
+| Accessibility | 88 | Naranja |
+| Best Practices | 100 | Verde |
+| SEO | 92 | Verde |
+| FCP | 1.5s | Naranja |
+| LCP | 2.0s | Naranja |
+| TBT | 0ms | Verde |
+| CLS | 0.771 | Rojo |
+| Speed Index | 1.5s | Naranja |
+
+**Problemas especificos:** Mismos problemas globales (CLS footer, contraste, links sin nombre, headings). Sin problemas propios adicionales.
+
+### Preguntas Frecuentes (`/preguntas-frecuentes`)
+| Metrica | Valor | Score |
+|---------|-------|-------|
+| Performance | **60** | Naranja |
+| Accessibility | 88 | Naranja |
+| Best Practices | 100 | Verde |
+| SEO | 92 | Verde |
+| FCP | 1.5s | Naranja |
+| LCP | 2.1s | Naranja |
+| TBT | 0ms | Verde |
+| CLS | 0.771 | Rojo |
+| Speed Index | 1.5s | Naranja |
+
+**Problemas especificos de FAQ:**
+- CLS 0.771 (el peor del sitio) causado por footer (logo sin dimensiones)
+- Contraste insuficiente: subtitulo gray-500, texto de la seccion "No encontraste...", textos footer
+- Links sin nombre: carrito, redes footer
+- Headings desordenados: h4 en footer
+
+### Login (`/login`)
+| Metrica | Valor | Score |
+|---------|-------|-------|
+| Performance | **69** | Naranja |
+| Accessibility | 73 | Naranja |
+| Best Practices | 100 | Verde |
+| SEO | 92 | Verde |
+| FCP | 1.6s | Naranja |
+| LCP | 1.9s | Naranja |
+| TBT | 0ms | Verde |
+| CLS | 0.318 | Rojo |
+| Speed Index | 1.6s | Naranja |
+
+**Problemas especificos de Login:**
+- CLS 0.318 causado por footer (logo sin dimensiones)
+- Accessibility 73:
+  - Boton ojito sin `aria-label`
+  - Input de contrasena (PasswordInput) sin label asociado
+  - Touch target del ojito demasiado pequeno
+  - Contraste insuficiente: link "Olvidaste tu contrasena?" (text-artisan-accent), textos footer
+  - Links sin nombre: carrito, redes footer
+  - Headings desordenados: h4 en footer
+- Logo navbar: falta `fetchpriority="high"`
+- Latencia critica: 668ms (la mas baja del sitio, pocas API calls)
+
+### Mi Perfil (`/mi-perfil`)
+| Metrica | Valor | Score |
+|---------|-------|-------|
+| Performance | **61** | Naranja |
+| Accessibility | 61 | Naranja |
+| Best Practices | 100 | Verde |
+| SEO | 92 | Verde |
+| FCP | 1.6s | Naranja |
+| LCP | 1.9s | Naranja |
+| TBT | 0ms | Verde |
+| CLS | 0.678 | Rojo |
+| Speed Index | 1.6s | Naranja |
+
+**Problemas especificos de Mi Perfil:**
+- CLS 0.678 causado por el footer (logo sin dimensiones)
+- Accessibility 61 (el peor del sitio):
+  - Botones del ojito de contrasena sin `aria-label`
+  - Inputs de contrasena sin labels asociados (el PasswordInput no propaga el label)
+  - Touch targets del ojito demasiado pequenos
+  - Contraste insuficiente en: rol "PRESIDENTE" (text-artisan-accent), "Email verificado" (text-green-600), fecha "Miembro desde" (text-gray-400), placeholder contrasena
+  - Links sin nombre: carrito, redes footer
+  - Headings desordenados: h3 y h4 despues de h1
+
+### Dashboard (`/dashboard`)
+| Metrica | Valor | Score |
+|---------|-------|-------|
+| Performance | **34** | Rojo |
+| Accessibility | 88 | Naranja |
+| Best Practices | 100 | Verde |
+| SEO | 92 | Verde |
+| FCP | 4.9s | Rojo |
+| LCP | 5.9s | Rojo |
+| TBT | 0ms | Verde |
+| CLS | 0.624 | Rojo |
+| Speed Index | 4.9s | Rojo |
+
+**Nota:** Score de 34 obtenido navegando desde la seccion de artesanos (carga pesada). El dashboard es la pagina mas lenta del sitio por la cantidad de datos que carga (8 API calls en cascada + Dashboard.vue pesa 237 KiB).
+
+**Problemas especificos de Dashboard:**
+- CLS 0.624 causado por el footer (logo sin dimensiones)
+- Dashboard.vue pesa 237 KiB (archivo mas grande del proyecto)
+- 8 llamadas API en cascada (artisans, products, categories, clients, orders, wishlist, user, cart)
+- Latencia maxima de cadena critica: 2,649ms
+- Contraste insuficiente en: badges del sidebar, textos gray-400 de KPIs, fecha de pedidos, textos del footer
+- Links sin nombre accesible: carrito navbar, redes sociales footer
+- Headings desordenados: h3 en panel despues de h1
+- Logo navbar sin fetchpriority=high
+- Imagenes sin width/height explicitos
+
+---
+
+**Problemas especificos de Contacto:**
+- CLS 0.683 causado por el footer (imagen del logo en el footer causa layout shift)
+- Contraste insuficiente en: etiqueta de rol en navbar (text-artisan-accent sobre fondo claro), textos grises sobre fondo artisan-bg, textos en footer
+- Links sin nombre accesible: icono del carrito (navbar), iconos de redes sociales (contacto y footer)
+- Headings desordenados: h4 en footer despues de h2 en contenido
+- robots.txt invalido (22 errores)
+- Image delivery: logo sin optimizar (69 KiB ahorro estimado)
+
 ---
 
 ## Problemas principales identificados
@@ -138,6 +359,59 @@ Se hacen 5 llamadas a la API en cascada al cargar la pagina.
 **Solucion:**
 - Las ProductCard ya tienen `aspect-[4/5]` que deberia reservar espacio
 - Verificar que el buscador y las categorias no causen reflow al cargar datos
+
+**Estado:** Pendiente
+
+### 8. Layout Shift en Contacto (CLS: 0.683)
+
+**Problema:** El footer causa un shift de 0.683 al cargarse la imagen del logo (`img.h-14.w-auto.invert.brightness-0`).
+
+**Solucion:** Agregar dimensiones fijas al logo del footer para reservar espacio.
+
+**Estado:** Pendiente
+
+---
+
+## Problemas de accesibilidad (aplican a todo el sitio)
+
+### A1. Contraste insuficiente (GLOBAL)
+
+**Elementos afectados:**
+- Etiqueta de rol en navbar (`text-artisan-accent` sobre fondo claro) - contraste bajo
+- Textos `text-gray-400` y `text-gray-500` sobre fondo `bg-artisan-bg` (#F9F7F2) - contraste bajo
+- Textos `text-gray-400` en footer sobre fondo `bg-artisan-dark` - contraste bajo
+- Placeholders en inputs
+
+**Solucion:** Oscurecer los grises: usar `text-gray-600` en vez de `text-gray-400/500` donde sea necesario, o cambiar `text-artisan-accent` (#E9A106) por un tono mas oscuro en textos sobre fondo claro.
+
+**Estado:** Pendiente
+
+### A2. Links sin nombre accesible (GLOBAL)
+
+**Elementos afectados:**
+- Icono del carrito en navbar (solo tiene SVG, no tiene `aria-label`)
+- Iconos de Facebook e Instagram en contacto y footer (solo SVG)
+
+**Solucion:** Agregar `aria-label` a todos los links que solo tienen iconos:
+- Carrito: `aria-label="Carrito de compras"`
+- Facebook: `aria-label="Facebook"`
+- Instagram: `aria-label="Instagram"`
+
+**Estado:** Pendiente
+
+### A3. Headings desordenados (GLOBAL)
+
+**Problema:** El footer usa `h4` que rompe la secuencia descendente de headings de la pagina.
+
+**Solucion:** Cambiar los `h4` del footer por `p` con clase de estilo, o asegurar que la jerarquia sea correcta.
+
+**Estado:** Pendiente
+
+### A4. robots.txt invalido
+
+**Problema:** Vite genera un robots.txt con errores en desarrollo. En produccion se debe crear uno correcto.
+
+**Solucion:** Crear `/public/robots.txt` con contenido valido.
 
 **Estado:** Pendiente
 
