@@ -24,7 +24,7 @@
       <!-- Fila inferior: Links -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
         <div>
-          <p class="text-sm font-bold mb-4 text-artisan-accent uppercase tracking-wider">Explorar</p>
+          <p class="text-sm font-bold mb-4 text-amber-400 uppercase tracking-wider">Explorar</p>
           <ul class="space-y-3 text-gray-300 text-sm">
             <li><router-link to="/catalogo" class="hover:text-white transition-colors">Catalogo</router-link></li>
             <li><router-link to="/nosotros" class="hover:text-white transition-colors">Nosotros</router-link></li>
@@ -33,7 +33,7 @@
           </ul>
         </div>
         <div>
-          <p class="text-sm font-bold mb-4 text-artisan-accent uppercase tracking-wider">Legal</p>
+          <p class="text-sm font-bold mb-4 text-amber-400 uppercase tracking-wider">Legal</p>
           <ul class="space-y-3 text-gray-300 text-sm">
             <li><router-link to="/terminos-y-condiciones" class="hover:text-white transition-colors">Terminos y Condiciones</router-link></li>
             <li><router-link to="/politica-de-privacidad" class="hover:text-white transition-colors">Politica de Privacidad</router-link></li>
@@ -41,7 +41,7 @@
           </ul>
         </div>
         <div class="sm:col-span-2 lg:col-span-2">
-          <p class="text-sm font-bold mb-4 text-artisan-accent uppercase tracking-wider">Contacto</p>
+          <p class="text-sm font-bold mb-4 text-amber-400 uppercase tracking-wider">Contacto</p>
           <ul class="space-y-3 text-gray-300 text-sm">
             <li class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-artisan-accent shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>

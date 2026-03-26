@@ -22,6 +22,7 @@
       <button
         v-if="authStore.isAuthenticated"
         @click.prevent="toggleWishlist"
+        :aria-label="isInWishlist ? 'Quitar de favoritos' : 'Agregar a favoritos'"
         class="absolute top-4 right-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform z-10"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-colors" :class="isInWishlist ? 'text-red-500' : 'text-gray-400'" :fill="isInWishlist ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
@@ -41,8 +42,8 @@
       <p class="text-sm text-gray-500 mb-4 italic">Por {{ product.artisan?.user?.name }}</p>
       
       <div class="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
-        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ product.category?.name }}</span>
-        <button @click="$emit('add-to-cart', product)" class="text-artisan-brown hover:scale-125 transition-transform">
+        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{{ product.category?.name }}</span>
+        <button @click="$emit('add-to-cart', product)" aria-label="Ver producto" class="text-artisan-brown hover:scale-125 transition-transform">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
