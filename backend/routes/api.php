@@ -15,6 +15,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/contact', [ContactController::class, 'send']);
+Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::get('/categories', [CategoryController::class, 'index']);
@@ -36,6 +37,7 @@ Route::delete('/cart/{itemId}', [CartController::class, 'destroy']);
 // Authenticated Endpoints
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::put('/user', [AuthController::class, 'updateProfile']);
 

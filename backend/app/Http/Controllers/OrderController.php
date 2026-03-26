@@ -33,6 +33,10 @@ class OrderController extends Controller
 
     public function checkout(Request $request, CorreoArgentinoService $caService)
     {
+        if (!$request->user()->email_verified_at) {
+            return response()->json(['message' => 'Debes verificar tu email antes de realizar una compra.'], 403);
+        }
+
         $request->validate([
             'shipping_name' => 'required|string|max:255',
             'shipping_address' => 'required|string|max:255',

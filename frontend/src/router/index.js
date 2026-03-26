@@ -17,6 +17,7 @@ const routes = [
   { path: '/politica-de-devoluciones', name: 'returns', component: () => import('../views/legal/ReturnsPolicy.vue') },
   { path: '/recuperar-contrasena', name: 'forgot-password', component: () => import('../views/auth/ForgotPassword.vue') },
   { path: '/restablecer-contrasena/:token', name: 'reset-password', component: () => import('../views/auth/ResetPassword.vue') },
+  { path: '/verificar-email', name: 'verify-email', component: () => import('../views/auth/VerifyEmail.vue') },
   { path: '/checkout', name: 'checkout', component: () => import('../views/Checkout.vue'), meta: { requiresAuth: true } },
   { path: '/pedido-confirmado/:id', name: 'order-confirmation', component: () => import('../views/OrderConfirmation.vue'), meta: { requiresAuth: true } },
   { path: '/dashboard', name: 'dashboard', component: () => import('../views/admin/Dashboard.vue'), meta: { requiresAuth: true, roles: ['admin', 'presidente'] } },

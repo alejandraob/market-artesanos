@@ -79,20 +79,49 @@
 
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-12">
         <transition-group name="list">
-          <ProductCard 
-            v-for="product in products" 
-            :key="product.id" 
+          <ProductCard
+            v-for="product in products"
+            :key="product.id"
             :product="product"
             @add-to-cart="handleAddToCart"
           />
         </transition-group>
+      </div>
+
+      <!-- Paginacion -->
+      <div v-if="totalPages > 1" class="flex items-center justify-center gap-2 mt-12">
+        <button
+          @click="goToPage(currentPage - 1)"
+          :disabled="currentPage <= 1"
+          class="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-artisan-bg hover:border-artisan-brown/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        </button>
+
+        <template v-for="page in visiblePages" :key="page">
+          <span v-if="page === '...'" class="w-10 h-10 flex items-center justify-center text-gray-400 text-sm">...</span>
+          <button
+            v-else
+            @click="goToPage(page)"
+            class="w-10 h-10 rounded-xl font-bold text-sm transition-colors"
+            :class="page === currentPage ? 'bg-artisan-brown text-white shadow-md' : 'border border-gray-200 text-gray-600 hover:bg-artisan-bg hover:border-artisan-brown/20'"
+          >{{ page }}</button>
+        </template>
+
+        <button
+          @click="goToPage(currentPage + 1)"
+          :disabled="currentPage >= totalPages"
+          class="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-artisan-bg hover:border-artisan-brown/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
       </div>
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../utils/api'
 import ProductCard from '../components/common/ProductCard.vue'
@@ -105,7 +134,28 @@ const loading = ref(true)
 const selectedCategory = ref(route.query.categoria || null)
 const expandedParents = ref([])
 const searchQuery = ref(route.query.buscar || '')
+const currentPage = ref(parseInt(route.query.pagina) || 1)
+const totalPages = ref(1)
 let searchTimeout = null
+
+const visiblePages = computed(() => {
+  const pages = []
+  const total = totalPages.value
+  const current = currentPage.value
+
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i)
+  } else {
+    pages.push(1)
+    if (current > 3) pages.push('...')
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+      pages.push(i)
+    }
+    if (current < total - 2) pages.push('...')
+    pages.push(total)
+  }
+  return pages
+})
 
 const toggleParent = (id) => {
   const idx = expandedParents.value.indexOf(id)
@@ -121,15 +171,25 @@ const fetchData = async () => {
   try {
     const [catsRes, prodsRes] = await Promise.all([
       api.get('/categories'),
-      api.get(`/products?category_id=${selectedCategory.value || ''}&search=${searchQuery.value || ''}`)
+      api.get(`/products?category_id=${selectedCategory.value || ''}&search=${searchQuery.value || ''}&page=${currentPage.value}`)
     ])
     categories.value = catsRes.data
     products.value = prodsRes.data.data
+    currentPage.value = prodsRes.data.current_page
+    totalPages.value = prodsRes.data.last_page
   } catch (error) {
     console.error("Error fetching catalog", error)
   } finally {
     loading.value = false
   }
+}
+
+const goToPage = (page) => {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  router.push({ query: { ...route.query, pagina: page > 1 ? page : undefined } })
+  fetchData()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const handleAddToCart = (product) => {
@@ -140,20 +200,23 @@ const handleAddToCart = (product) => {
 const onSearchInput = () => {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
-    router.push({ query: { ...route.query, buscar: searchQuery.value || undefined } })
+    currentPage.value = 1
+    router.push({ query: { ...route.query, buscar: searchQuery.value || undefined, pagina: undefined } })
     fetchData()
   }, 400)
 }
 
 const clearSearch = () => {
   searchQuery.value = ''
-  router.push({ query: { ...route.query, buscar: undefined } })
+  currentPage.value = 1
+  router.push({ query: { ...route.query, buscar: undefined, pagina: undefined } })
   fetchData()
 }
 
 const setCategory = (id) => {
   selectedCategory.value = id
-  router.push({ query: { ...route.query, categoria: id } })
+  currentPage.value = 1
+  router.push({ query: { ...route.query, categoria: id, pagina: undefined } })
 }
 
 watch(() => route.query.categoria, (newVal) => {

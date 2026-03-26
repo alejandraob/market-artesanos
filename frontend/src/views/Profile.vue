@@ -12,6 +12,18 @@
         <p class="text-sm text-gray-500">{{ auth.user?.email }}</p>
         <span class="inline-block mt-3 text-xs font-bold uppercase px-3 py-1 rounded-full bg-artisan-accent/10 text-artisan-accent">{{ auth.user?.role }}</span>
         <p class="text-xs text-gray-400 mt-4">Miembro desde {{ formatDate(auth.user?.created_at) }}</p>
+
+        <!-- Verificacion email -->
+        <div v-if="!auth.user?.email_verified_at" class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-left">
+          <p class="text-amber-700 text-xs font-semibold">Email no verificado</p>
+          <button @click="resendVerification" :disabled="resending" class="text-xs text-amber-600 font-bold underline mt-1">
+            {{ resending ? 'Enviando...' : 'Reenviar verificacion' }}
+          </button>
+          <p v-if="resendMsg" class="text-green-600 text-xs mt-1">{{ resendMsg }}</p>
+        </div>
+        <div v-else class="mt-4">
+          <span class="text-xs text-green-600 font-bold">Email verificado</span>
+        </div>
       </div>
 
       <!-- Edit form -->
@@ -106,6 +118,21 @@ const orders = ref([])
 const saving = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
+const resending = ref(false)
+const resendMsg = ref('')
+
+const resendVerification = async () => {
+  resending.value = true
+  resendMsg.value = ''
+  try {
+    const res = await api.post('/resend-verification')
+    resendMsg.value = res.data.message
+  } catch (error) {
+    resendMsg.value = 'Error al reenviar.'
+  } finally {
+    resending.value = false
+  }
+}
 
 const form = reactive({
   name: '',

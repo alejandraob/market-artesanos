@@ -196,9 +196,18 @@
             <p class="text-amber-700 text-xs font-semibold">Algunos productos superan las 5 unidades. El plazo de entrega sera mayor al habitual.</p>
           </div>
 
+          <!-- Email no verificado -->
+          <div v-if="!emailVerified" class="mt-4 bg-red-50 border border-red-200 rounded-xl p-3">
+            <p class="text-red-700 text-xs font-semibold">Debes verificar tu email antes de comprar. Revisa tu casilla de correo.</p>
+            <button @click="resendVerification" :disabled="resending" class="text-xs text-red-600 font-bold underline mt-1">
+              {{ resending ? 'Enviando...' : 'Reenviar email de verificacion' }}
+            </button>
+            <p v-if="resendMsg" class="text-green-600 text-xs mt-1">{{ resendMsg }}</p>
+          </div>
+
           <button
             @click="irAlPago"
-            :disabled="shippingCostSelected === null"
+            :disabled="shippingCostSelected === null || !emailVerified"
             class="btn-primary w-full mt-6 py-4 text-lg rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Continuar al Pago
@@ -229,6 +238,23 @@ const loading = ref(true)
 const processing = ref(false)
 const checkoutError = ref('')
 const step = ref('form') // 'form' o 'payment'
+const resending = ref(false)
+const resendMsg = ref('')
+
+const emailVerified = computed(() => !!auth.user?.email_verified_at)
+
+const resendVerification = async () => {
+  resending.value = true
+  resendMsg.value = ''
+  try {
+    const res = await api.post('/resend-verification')
+    resendMsg.value = res.data.message
+  } catch (error) {
+    resendMsg.value = 'Error al reenviar.'
+  } finally {
+    resending.value = false
+  }
+}
 
 const calculandoEnvio = ref(false)
 const shippingRates = ref(null)

@@ -182,13 +182,35 @@ Documento que registra las tareas completadas, correcciones realizadas y mejoras
 
 **Archivos modificados:** `CategoryController.php`, `Dashboard.vue`
 
-### 2.5 Paginacion en el catalogo frontend
+### 2.5 Paginacion en el catalogo frontend (COMPLETADO - 26/03/2026)
 
-**Estado:** Pendiente
+**Implementacion:**
+- Controles de paginacion debajo del grid de productos (flechas prev/next + numeros de pagina)
+- Paginas visibles inteligentes: muestra 1, ..., paginas cercanas, ..., ultima (para no saturar con muchos numeros)
+- Pagina actual resaltada con estilo activo
+- Al cambiar categoria o busqueda, se resetea automaticamente a pagina 1
+- Estado persistido en la URL (`?pagina=2`) para compartir links
+- Scroll al inicio al cambiar de pagina
+- El backend ya paginaba a 15 productos por pagina, solo faltaba el frontend
 
-### 2.6 Verificacion de email
+**Archivos modificados:** `Catalog.vue`
 
-**Estado:** Pendiente
+### 2.6 Verificacion de email (COMPLETADO - 26/03/2026)
+
+**Backend:**
+- `AuthController@sendVerificationEmail`: genera token con hash(id + email + app_key), envia email con link al frontend
+- `POST /api/verify-email`: recibe id y token, valida, marca `email_verified_at`
+- `POST /api/resend-verification`: reenvía email de verificacion (autenticado)
+- `OrderController@checkout`: bloquea la compra si `email_verified_at` es null (retorna 403)
+- El email de verificacion se envia automaticamente al registrarse
+
+**Frontend:**
+- `VerifyEmail.vue` (`/verificar-email?id=X&token=Y`): procesa el link del email, muestra exito o error, actualiza el usuario local
+- `Checkout.vue`: banner rojo si email no verificado, con boton "Reenviar email de verificacion". Boton de pago deshabilitado
+- `Profile.vue`: indicador "Email no verificado" con boton de reenvio, o "Email verificado" en verde
+
+**Archivos creados:** `VerifyEmail.vue`, `emails/verify-email.blade.php`
+**Archivos modificados:** `AuthController.php`, `OrderController.php`, `api.php`, `router/index.js`, `Checkout.vue`, `Profile.vue`
 
 ---
 

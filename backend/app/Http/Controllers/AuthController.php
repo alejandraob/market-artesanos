@@ -33,6 +33,12 @@ class AuthController extends Controller
 
         $this->mergeGuestCart($request, $user);
 
+        try {
+            $this->sendVerificationEmail($user);
+        } catch (\Exception $e) {
+            // No bloquear el registro si falla el email
+        }
+
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
@@ -151,6 +157,54 @@ class AuthController extends Controller
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
         return response()->json(['message' => 'Contrasena actualizada correctamente.']);
+    }
+
+    public function sendVerificationEmail(User $user)
+    {
+        if ($user->email_verified_at) return;
+
+        $token = hash('sha256', $user->id . $user->email . config('app.key'));
+        $verifyUrl = config('app.frontend_url') . '/verificar-email?id=' . $user->id . '&token=' . $token;
+
+        Mail::send('emails.verify-email', ['user' => $user, 'verifyUrl' => $verifyUrl], function ($msg) use ($user) {
+            $msg->to($user->email)->subject('Verifica tu email - Asociacion de Artesanos');
+        });
+    }
+
+    public function verifyEmail(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer',
+            'token' => 'required|string',
+        ]);
+
+        $user = User::findOrFail($request->id);
+        $expectedToken = hash('sha256', $user->id . $user->email . config('app.key'));
+
+        if ($request->token !== $expectedToken) {
+            return response()->json(['message' => 'Token de verificacion invalido.'], 400);
+        }
+
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'El email ya fue verificado.']);
+        }
+
+        $user->update(['email_verified_at' => now()]);
+
+        return response()->json(['message' => 'Email verificado correctamente.']);
+    }
+
+    public function resendVerification(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'El email ya esta verificado.']);
+        }
+
+        $this->sendVerificationEmail($user);
+
+        return response()->json(['message' => 'Email de verificacion reenviado.']);
     }
 
     public function logout(Request $request)
