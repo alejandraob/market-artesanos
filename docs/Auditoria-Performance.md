@@ -486,7 +486,7 @@ Trace grabado post-optimizacion de imagenes, cache limpio.
 **2. Doble llamada a /api/cart**
 - El navbar llama `GET /api/cart` para el contador Y la pagina de carrito/checkout tambien lo llama.
 - Son 2 requests identicos en paralelo.
-- Estado: Pendiente de optimizacion
+- Estado: CORREGIDO (26/03/2026) - cart store centralizado, de 28 a 4 llamadas por sesion
 
 **3. Total de 89 API calls en una sesion de navegacion completa**
 - Incluye: login, navegacion por catalogo, producto, carrito, checkout, confirmacion, contacto, nosotros
@@ -503,7 +503,21 @@ Trace grabado post-optimizacion de imagenes, cache limpio.
 ### Imagenes cargadas (confirmacion WebP)
 - Productos: `.webp` (72 KiB y 94 KiB vs 444 KiB y 837 KiB originales)
 - Artesano: `.webp` (9 KiB vs 18 KiB original)
-- Estaticas pendientes de conversion: `logo-sinfondo.png` (70 KiB), `manos-bordado.jpg` (64 KiB)
+- ~~Estaticas pendientes~~ RESUELTO: logo (70->11 KiB), manos (64->29 KiB), asociacion (74->68 KiB)
+
+### Trace 4 - Post todas las optimizaciones (26/03/2026)
+
+| Metrica | Trace 1 | Trace 4 | Mejora |
+|---------|---------|---------|--------|
+| Events totales | 1,101K | 674K | -39% |
+| Layout shifts | 53 | 12 | -77% |
+| CLS acumulado | 8.68 | 1.11 | -87% |
+| Shift maximo | 0.73 | 0.27 | -63% |
+| /api/cart calls | 28+ | 4 | -86% |
+| API calls total | 96 | 62 | -35% |
+| Imagenes JPG/PNG | Todas | 0 | 100% WebP |
+
+**Conclusion:** Las optimizaciones de rendimiento han alcanzado un punto de rendimientos decrecientes. Las mejoras restantes (JS minificado, cache headers, gzip) se resuelven automaticamente con `npm run build` y configuracion del servidor de produccion.
 
 ---
 
