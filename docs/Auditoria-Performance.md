@@ -445,20 +445,65 @@ Se hacen 5 llamadas a la API en cascada al cargar la pagina.
 ## Plan de mejora de performance
 
 ### Prioridad 1 - Pre-deploy (mejora inmediata):
-1. Build de produccion (`npm run build`) - resuelve JS sin minificar y JS no utilizado
-2. Convertir imagenes estaticas a WebP y redimensionar (logo, hero, nosotros)
-3. Agregar `width`/`height` a imagenes para reducir CLS
-4. Agregar `<link rel="preconnect">` al backend API
+1. ~~Build de produccion (`npm run build`)~~ - se aplica al deployar
+2. ~~Convertir imagenes de productos a WebP~~ - HECHO (ImageService + comando optimize)
+3. ~~Agregar `width`/`height` a imagenes para reducir CLS~~ - HECHO (logo navbar/footer)
+4. Convertir imagenes estaticas a WebP (logo-sinfondo.png, manos-bordado.jpg, asociacion-artesanos.jpg)
+5. Eliminar doble llamada a /api/cart (navbar + pagina)
 
 ### Prioridad 2 - Post-deploy:
-5. Configurar headers de cache en el servidor
-6. Implementar redimensionado automatico de imagenes al subir (Intervention Image)
-7. Evaluar SSR parcial o pre-rendering para paginas estaticas (Home, Nosotros, FAQ)
+6. Configurar headers de cache en el servidor (nginx/apache)
+7. Cache de datos en Pinia con TTL (categories, etc.)
+8. Agregar `<link rel="preconnect">` al backend API en produccion
 
 ### Prioridad 3 - Optimizacion avanzada:
-8. Implementar service worker para cache offline
-9. Lazy loading de componentes pesados
+9. Implementar service worker para cache offline
 10. CDN para assets estaticos
+11. Evaluar SSR parcial para Home y paginas estaticas
+
+---
+
+## Analisis de Trace (Chrome DevTools Performance) - 26/03/2026
+
+Trace grabado post-optimizacion de imagenes, cache limpio.
+
+### Comparacion antes/despues de optimizaciones
+
+| Metrica | Trace anterior | Trace actual | Cambio |
+|---------|---------------|--------------|--------|
+| Layout shifts (sin input) | 53 | **16** | -70% |
+| CLS acumulado sesion | 8.68 | **1.86** | -78% |
+| Imagenes JPG cargadas | Si (.jpg pesados) | **No (todo WebP)** | Resuelto |
+
+### Hallazgos del trace
+
+**1. Imagenes estaticas se recargan multiples veces**
+- `logo-sinfondo.png`: 7 cargas durante la sesion
+- `manos-bordado.jpg`: 4 cargas
+- Causa: sin headers de cache en desarrollo. Se resuelve configurando cache en produccion.
+- Estado: Pendiente (configuracion de servidor)
+
+**2. Doble llamada a /api/cart**
+- El navbar llama `GET /api/cart` para el contador Y la pagina de carrito/checkout tambien lo llama.
+- Son 2 requests identicos en paralelo.
+- Estado: Pendiente de optimizacion
+
+**3. Total de 89 API calls en una sesion de navegacion completa**
+- Incluye: login, navegacion por catalogo, producto, carrito, checkout, confirmacion, contacto, nosotros
+- Muchas llamadas se repiten al navegar (categories se llama cada vez que se entra al catalogo)
+- Optimizacion futura: cache de datos en Pinia con TTL
+
+**4. Layout shifts restantes (top 3)**
+- Score 0.42: navegacion entre paginas (contenido cambia altura, footer se mueve)
+- Score 0.27: carga de datos asincrona en pagina
+- Score 0.27: misma causa en otra navegacion
+- Causa raiz: en SPA, al cambiar de pagina el contenido viejo se va y el nuevo llega con distinta altura
+- Solucion parcial aplicada: min-height en main + contain en footer
+
+### Imagenes cargadas (confirmacion WebP)
+- Productos: `.webp` (72 KiB y 94 KiB vs 444 KiB y 837 KiB originales)
+- Artesano: `.webp` (9 KiB vs 18 KiB original)
+- Estaticas pendientes de conversion: `logo-sinfondo.png` (70 KiB), `manos-bordado.jpg` (64 KiB)
 
 ---
 
@@ -470,7 +515,14 @@ Muchas de las metricas de Lighthouse van a mejorar significativamente en producc
 - **Cache**: se configura en el servidor web
 - **Performance score**: se espera subir de ~57-69 a ~80-90 con el build de produccion
 
-Los problemas reales que necesitan atencion manual son:
-1. **Imagenes** (conversion a WebP, redimensionado)
-2. **CLS** (dimensiones explicitas en imagenes)
-3. **Cadena de requests** (preconnect, reducir waterfall)
+Problemas resueltos:
+1. ~~**Imagenes productos**~~ - RESUELTO: WebP automatico al subir + comando optimize (-87%)
+2. ~~**CLS footer**~~ - PARCIALMENTE RESUELTO: min-height + contain + dimensiones logo
+3. ~~**Accesibilidad**~~ - RESUELTO: aria-labels, alt, contraste, headings (promedio 79->92)
+4. ~~**SEO**~~ - RESUELTO: meta tags, titulos, robots.txt (100 en casi todas)
+
+Problemas pendientes para produccion:
+1. **Imagenes estaticas** (logo, hero, asociacion) - convertir a WebP manualmente
+2. **Doble request /api/cart** - optimizar con store compartido
+3. **Cache headers** - configurar en servidor web
+4. **CLS navegacion SPA** - los shifts al cambiar pagina son inherentes a SPA sin SSR
