@@ -3,20 +3,29 @@ import api from '../utils/api'
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    count: 0,
+    items: [],
+    loaded: false,
   }),
+  getters: {
+    count: (state) => state.items.reduce((sum, item) => sum + item.quantity, 0),
+  },
   actions: {
-    async fetchCount() {
+    async fetchCart() {
       try {
         const res = await api.get('/cart')
-        const items = res.data.items || []
-        this.count = items.reduce((sum, item) => sum + item.quantity, 0)
+        this.items = res.data.items || []
+        this.loaded = true
       } catch {
-        this.count = 0
+        this.items = []
       }
     },
+    async fetchCount() {
+      // Alias para compatibilidad - ahora carga todo
+      await this.fetchCart()
+    },
     clear() {
-      this.count = 0
+      this.items = []
+      this.loaded = false
     }
   }
 })

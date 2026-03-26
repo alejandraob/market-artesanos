@@ -55,23 +55,12 @@ import { useCartStore } from '../stores/cart'
 
 const cartStore = useCartStore()
 
-const cartItems = ref([])
-const loading = ref(true)
+const cartItems = computed(() => cartStore.items)
+const loading = ref(!cartStore.loaded)
 
 const total = computed(() => {
   return cartItems.value.reduce((acc, item) => acc + (item.product?.price * item.quantity), 0)
 })
-
-const fetchCart = async () => {
-  try {
-    const res = await api.get('/cart')
-    cartItems.value = res.data.items || []
-  } catch (error) {
-    console.error('Error fetching cart', error)
-  } finally {
-    loading.value = false
-  }
-}
 
 const updateQuantity = async (item, delta) => {
   const newQty = item.quantity + delta
@@ -79,7 +68,7 @@ const updateQuantity = async (item, delta) => {
   try {
     await api.put(`/cart/${item.id}`, { quantity: newQty })
     item.quantity = newQty
-    cartStore.fetchCount()
+    cartStore.fetchCart()
   } catch (error) {
     console.error('Error updating quantity', error)
   }
@@ -88,12 +77,14 @@ const updateQuantity = async (item, delta) => {
 const removeItem = async (id) => {
   try {
     await api.delete(`/cart/${id}`)
-    cartItems.value = cartItems.value.filter(i => i.id !== id)
-    cartStore.fetchCount()
+    cartStore.fetchCart()
   } catch (error) {
     console.error('Error removing item', error)
   }
 }
 
-onMounted(fetchCart)
+onMounted(async () => {
+  if (!cartStore.loaded) await cartStore.fetchCart()
+  loading.value = false
+})
 </script>

@@ -7,7 +7,7 @@
         <div class="flex-shrink-0 flex items-center group cursor-pointer z-50">
           <router-link to="/" class="flex items-center gap-4 outline-none">
             <div class="relative w-16 h-16 md:w-20 md:h-20 flex justify-center items-center drop-shadow-md group-hover:scale-110 transition-transform duration-500 ease-in-out">
-               <img src="/logo-sinfondo.png" alt="Asociacion de Artesanos" class="h-full w-auto object-contain" width="80" height="73" fetchpriority="high" />
+               <img src="/logo-sinfondo.webp" alt="Asociacion de Artesanos" class="h-full w-auto object-contain" width="80" height="73" fetchpriority="high" />
             </div>
             <div class="hidden md:flex flex-col">
               <span class="font-extrabold text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-br from-artisan-brown to-artisan-green tracking-tight leading-none group-hover:from-artisan-accent group-hover:to-artisan-brown transition-all duration-500">Asociación de</span>

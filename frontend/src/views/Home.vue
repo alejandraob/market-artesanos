@@ -32,7 +32,7 @@
         <div class="hidden lg:flex justify-end order-first lg:order-last">
           <div class="relative w-full max-w-md aspect-square">
             <div class="absolute -inset-10 bg-artisan-accent/20 rounded-full blur-3xl animate-pulse"></div>
-            <img src="/logo-sinfondo.png" alt="Artesanos" class="relative w-full h-full object-contain drop-shadow-2xl" />
+            <img src="/logo-sinfondo.webp" alt="Artesanos" class="relative w-full h-full object-contain drop-shadow-2xl" />
           </div>
         </div>
       </div>
@@ -85,7 +85,7 @@
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center py-20">
       <div class="relative order-last lg:order-first">
         <div class="absolute -inset-10 bg-artisan-brown/10 rounded-[4rem] blur-2xl"></div>
-        <img src="/manos-bordado.jpg" class="relative rounded-[3rem] shadow-2xl hover:scale-105 transition-all duration-700 object-cover w-full h-96" alt="Manos y bordado artesanal" />
+        <img src="/manos-bordado.webp" class="relative rounded-[3rem] shadow-2xl hover:scale-105 transition-all duration-700 object-cover w-full h-96" alt="Manos y bordado artesanal" />
       </div>
       <div class="space-y-10">
         <h2 class="text-5xl font-black text-artisan-dark">El Alma en el <span class="text-artisan-brown">Proceso</span></h2>

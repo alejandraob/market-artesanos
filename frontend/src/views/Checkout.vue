@@ -233,8 +233,8 @@ const router = useRouter()
 const auth = useAuthStore()
 const cartStore = useCartStore()
 
-const cartItems = ref([])
-const loading = ref(true)
+const cartItems = computed(() => cartStore.items)
+const loading = ref(!cartStore.loaded)
 const processing = ref(false)
 const checkoutError = ref('')
 const step = ref('form') // 'form' o 'payment'
@@ -311,8 +311,7 @@ onMounted(async () => {
   }
 
   try {
-    const res = await api.get('/cart')
-    cartItems.value = res.data.items || []
+    if (!cartStore.loaded) await cartStore.fetchCart()
     if (!cartItems.value.length) return
   } catch (error) {
     console.error('Error fetching cart', error)

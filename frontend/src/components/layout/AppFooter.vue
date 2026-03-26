@@ -5,7 +5,7 @@
       <!-- Fila superior: Logo + redes -->
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 pb-10 border-b border-white/10">
         <div class="flex items-center gap-4">
-          <img src="/logo-sinfondo.png" class="h-14 w-auto invert brightness-0" alt="Logo Asociacion de Artesanos" width="56" height="56" />
+          <img src="/logo-sinfondo.webp" class="h-14 w-auto invert brightness-0" alt="Logo Asociacion de Artesanos" width="56" height="56" />
           <div>
             <span class="text-2xl font-bold tracking-tight block">Asociacion de Artesanos</span>
             <span class="text-sm text-gray-300">Catriel, Rio Negro</span>
