@@ -67,12 +67,31 @@
             </div>
           </div>
           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 class="font-bold text-gray-700 mb-4">Productos con Bajo Stock</h3>
-            <div v-if="lowStockProducts.length === 0" class="text-gray-400 text-sm py-4">Todos los productos tienen stock suficiente</div>
+            <h3 class="font-bold text-gray-700 mb-4">Productos Mas Vendidos</h3>
+            <div v-if="topProducts.length === 0" class="text-gray-400 text-sm py-4">Sin ventas aun</div>
             <div v-else class="space-y-3">
-              <div v-for="prod in lowStockProducts" :key="prod.id" class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                <span class="font-semibold text-sm">{{ prod.name }}</span>
-                <span class="text-xs font-bold px-2 py-1 rounded-full bg-red-100 text-red-700">{{ prod.stock }} unidades</span>
+              <div v-for="(prod, idx) in topProducts" :key="prod.name" class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-black text-artisan-accent w-5">{{ idx + 1 }}</span>
+                  <span class="font-semibold text-sm">{{ prod.name }}</span>
+                </div>
+                <span class="text-xs font-bold px-2 py-1 rounded-full bg-artisan-accent/10 text-artisan-accent">{{ prod.total }} vendidos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h3 class="font-bold text-gray-700 mb-4">Provincias con Mas Pedidos</h3>
+            <div v-if="topProvinces.length === 0" class="text-gray-400 text-sm py-4">Sin pedidos con direccion aun</div>
+            <div v-else class="space-y-3">
+              <div v-for="(prov, idx) in topProvinces" :key="prov.province" class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-black text-artisan-brown w-5">{{ idx + 1 }}</span>
+                  <span class="font-semibold text-sm">{{ prov.province }}</span>
+                </div>
+                <span class="text-xs font-bold px-2 py-1 rounded-full bg-artisan-brown/10 text-artisan-brown">{{ prov.count }} {{ prov.count === 1 ? 'pedido' : 'pedidos' }}</span>
               </div>
             </div>
           </div>
@@ -685,7 +704,33 @@ const menuItems = computed(() => [
   { key: 'categorias', label: 'Categorias', icon: '📂', badge: categories.value.length || null },
 ])
 
-const lowStockProducts = computed(() => allProducts.value.filter(p => p.stock <= 5 && p.stock > 0))
+const topProducts = computed(() => {
+  const productMap = {}
+  for (const order of orders.value) {
+    for (const item of (order.items || [])) {
+      const name = item.product?.name || 'Producto eliminado'
+      productMap[name] = (productMap[name] || 0) + item.quantity
+    }
+  }
+  return Object.entries(productMap)
+    .map(([name, total]) => ({ name, total }))
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 5)
+})
+
+const topProvinces = computed(() => {
+  const provMap = {}
+  for (const order of orders.value) {
+    const prov = order.shipping_province
+    if (prov) {
+      provMap[prov] = (provMap[prov] || 0) + 1
+    }
+  }
+  return Object.entries(provMap)
+    .map(([province, count]) => ({ province, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
+})
 
 // Fetch data
 const fetchAll = async () => {

@@ -86,7 +86,7 @@
             </div>
             <div>
               <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Telefono de contacto</label>
-              <input v-model="form.shipping_phone" class="input-field" placeholder="Ej: 2920-000000" />
+              <input v-model="form.shipping_phone" class="input-field" placeholder="Ej: 2920-000000" maxlength="20" />
               <p v-if="errors.shipping_phone" class="text-red-500 text-xs mt-1">{{ errors.shipping_phone }}</p>
             </div>
           </div>

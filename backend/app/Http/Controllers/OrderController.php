@@ -43,7 +43,7 @@ class OrderController extends Controller
             'shipping_city' => 'required|string|max:255',
             'shipping_province' => 'required|string|max:255',
             'shipping_postal_code' => 'required|string|max:10',
-            'shipping_phone' => 'required|string|max:50',
+            'shipping_phone' => 'required|string|max:20',
             'shipping_cost' => 'required|numeric|min:0',
         ]);
 
