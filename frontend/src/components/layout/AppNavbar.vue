@@ -28,6 +28,13 @@
             Contacto
           </router-link>
           
+          <router-link v-if="auth.isAuthenticated" to="/favoritos" aria-label="Mis favoritos" class="relative group p-2 hover:bg-artisan-accent/10 rounded-full transition-colors flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-artisan-brown group-hover:text-red-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            <span v-if="wishlistCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow">{{ wishlistCount }}</span>
+          </router-link>
+
           <router-link to="/carrito" aria-label="Carrito de compras" class="relative group p-2 hover:bg-artisan-accent/10 rounded-full transition-colors flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-artisan-brown group-hover:text-artisan-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -53,6 +60,7 @@
                 <div class="absolute right-0 w-48 mt-2 py-2 bg-white rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-100 transform origin-top-right scale-95 group-hover:scale-100">
                   <router-link v-if="auth.user?.role === 'admin' || auth.user?.role === 'presidente'" to="/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-artisan-bg hover:text-artisan-brown transition-colors">Mi Panel</router-link>
                   <router-link to="/mi-perfil" class="block px-4 py-2 text-sm text-gray-700 hover:bg-artisan-bg hover:text-artisan-brown transition-colors">Mi Perfil</router-link>
+                  <router-link to="/favoritos" class="block px-4 py-2 text-sm text-gray-700 hover:bg-artisan-bg hover:text-artisan-brown transition-colors">Mis Favoritos</router-link>
                   <button @click="logout" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">Cerrar Sesion</button>
                 </div>
               </div>
@@ -74,12 +82,15 @@
 import { computed, onMounted } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import { useCartStore } from '../../stores/cart'
+import { useWishlistStore } from '../../stores/wishlist'
 import { useRouter } from 'vue-router'
 
 const auth = useAuthStore()
 const cartStore = useCartStore()
+const wishlistStore = useWishlistStore()
 const router = useRouter()
 const cartCount = computed(() => cartStore.count)
+const wishlistCount = computed(() => wishlistStore.count)
 
 onMounted(() => {
   if (!cartStore.loaded) cartStore.fetchCart()
