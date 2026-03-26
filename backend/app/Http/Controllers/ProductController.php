@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Services\CorreoArgentinoService;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -62,9 +63,10 @@ class ProductController extends Controller
         $data['slug'] = Str::slug($data['name']) . '-' . uniqid();
 
         if ($request->hasFile('image_files')) {
+            $imageService = new ImageService();
             $images = [];
             foreach ($request->file('image_files') as $file) {
-                $images[] = $file->store('products', 'public');
+                $images[] = $imageService->processAndStore($file, 'products', 800, 80);
             }
             $data['images'] = $images;
         }
@@ -103,9 +105,10 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('image_files')) {
+            $imageService = new ImageService();
             $images = $product->images ?? [];
             foreach ($request->file('image_files') as $file) {
-                $images[] = $file->store('products', 'public');
+                $images[] = $imageService->processAndStore($file, 'products', 800, 80);
             }
             $data['images'] = $images;
         }

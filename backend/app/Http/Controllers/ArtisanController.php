@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Services\ImageService;
 
 class ArtisanController extends Controller
 {
@@ -59,7 +60,8 @@ class ArtisanController extends Controller
 
         $photoPath = null;
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('artisans', 'public');
+            $imageService = new ImageService();
+            $photoPath = $imageService->processAndStore($request->file('photo'), 'artisans', 400, 80);
         }
 
         $artisan = Artisan::create([
@@ -99,7 +101,8 @@ class ArtisanController extends Controller
             if ($artisan->photo) {
                 Storage::disk('public')->delete($artisan->photo);
             }
-            $artisan->photo = $request->file('photo')->store('artisans', 'public');
+            $imageService = new ImageService();
+            $artisan->photo = $imageService->processAndStore($request->file('photo'), 'artisans', 400, 80);
         }
 
         $artisan->fill($request->only(['specialty', 'bio', 'location', 'is_active']));
