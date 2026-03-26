@@ -12,11 +12,11 @@
       </div>
       <div>
         <label class="block text-sm font-medium mb-1">Contraseña</label>
-        <input v-model="form.password" type="password" class="input-field" required />
+        <PasswordInput v-model="form.password" required placeholder="Minimo 8 caracteres" />
       </div>
       <div>
         <label class="block text-sm font-medium mb-1">Confirmar Contraseña</label>
-        <input v-model="form.password_confirmation" type="password" class="input-field" required />
+        <PasswordInput v-model="form.password_confirmation" required placeholder="Repetir contraseña" />
       </div>
       <div v-if="errorMsg" class="text-red-500 text-sm font-semibold bg-red-50 p-3 rounded-xl">{{ errorMsg }}</div>
       <button :disabled="loading" class="btn-primary w-full py-2 mt-4">
@@ -31,6 +31,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import PasswordInput from '../../components/common/PasswordInput.vue'
 import api from '../../utils/api'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'

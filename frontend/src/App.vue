@@ -11,19 +11,24 @@
     </main>
 
     <AppFooter />
+    <AppToast />
   </div>
 </template>
 
 <script setup>
 import { onMounted } from 'vue'
 import { useAuthStore } from './stores/auth'
+import { useWishlistStore } from './stores/wishlist'
 import AppNavbar from './components/layout/AppNavbar.vue'
 import AppFooter from './components/layout/AppFooter.vue'
+import AppToast from './components/common/AppToast.vue'
 
 const auth = useAuthStore()
+const wishlist = useWishlistStore()
 
 onMounted(() => {
   auth.fetchUser()
+  if (auth.isAuthenticated) wishlist.fetch()
 })
 </script>
 

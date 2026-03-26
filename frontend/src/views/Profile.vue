@@ -49,11 +49,11 @@
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Nueva contrasena</label>
-              <input v-model="form.password" type="password" class="input-field" placeholder="********" />
+              <PasswordInput v-model="form.password" placeholder="********" />
             </div>
             <div>
               <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Confirmar contrasena</label>
-              <input v-model="form.password_confirmation" type="password" class="input-field" placeholder="********" />
+              <PasswordInput v-model="form.password_confirmation" placeholder="********" />
             </div>
           </div>
 
@@ -110,6 +110,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import PasswordInput from '../components/common/PasswordInput.vue'
 import { useAuthStore } from '../stores/auth'
 import api, { storageUrl } from '../utils/api'
 

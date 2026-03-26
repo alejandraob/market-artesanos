@@ -9,6 +9,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\WishlistController;
 
 // Public Endpoints
 Route::post('/register', [AuthController::class, 'register']);
@@ -16,6 +18,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/contact', [ContactController::class, 'send']);
 Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+Route::get('/products/{productId}/reviews', [ReviewController::class, 'index']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::get('/categories', [CategoryController::class, 'index']);
@@ -38,6 +41,11 @@ Route::delete('/cart/{itemId}', [CartController::class, 'destroy']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
+    Route::post('/products/{productId}/reviews', [ReviewController::class, 'store']);
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
+
+    Route::get('/wishlist', [WishlistController::class, 'index']);
+    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::put('/user', [AuthController::class, 'updateProfile']);
 

@@ -8,7 +8,7 @@
       </div>
       <div>
         <label class="block text-sm font-medium mb-1">Contraseña</label>
-        <input v-model="form.password" type="password" class="input-field" required />
+        <PasswordInput v-model="form.password" required placeholder="********" />
       </div>
       <div v-if="errorMsg" class="text-red-500 text-sm font-semibold bg-red-50 p-3 rounded-xl">{{ errorMsg }}</div>
       <button :disabled="loading" class="btn-primary w-full py-2 mt-4">
@@ -26,6 +26,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import PasswordInput from '../../components/common/PasswordInput.vue'
 import { useAuthStore } from '../../stores/auth'
 import { useCartStore } from '../../stores/cart'
 import { useRouter } from 'vue-router'

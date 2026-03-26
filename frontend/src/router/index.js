@@ -4,24 +4,26 @@ import Catalog from '../views/Catalog.vue'
 import ProductDetail from '../views/ProductDetail.vue'
 
 const routes = [
-  { path: '/', name: 'home', component: Home },
-  { path: '/catalogo', name: 'catalog', component: Catalog },
-  { path: '/producto/:slug', name: 'product-detail', component: ProductDetail },
-  { path: '/carrito', name: 'cart', component: () => import('../views/Cart.vue') },
-  { path: '/nosotros', name: 'nosotros', component: () => import('../views/Nosotros.vue') },
-  { path: '/contacto', name: 'contact', component: () => import('../views/Contact.vue') },
-  { path: '/login', name: 'login', component: () => import('../views/auth/Login.vue') },
-  { path: '/registro', name: 'register', component: () => import('../views/auth/Register.vue') },
-  { path: '/terminos-y-condiciones', name: 'terms', component: () => import('../views/legal/TermsConditions.vue') },
-  { path: '/politica-de-privacidad', name: 'privacy', component: () => import('../views/legal/PrivacyPolicy.vue') },
-  { path: '/politica-de-devoluciones', name: 'returns', component: () => import('../views/legal/ReturnsPolicy.vue') },
-  { path: '/recuperar-contrasena', name: 'forgot-password', component: () => import('../views/auth/ForgotPassword.vue') },
-  { path: '/restablecer-contrasena/:token', name: 'reset-password', component: () => import('../views/auth/ResetPassword.vue') },
-  { path: '/verificar-email', name: 'verify-email', component: () => import('../views/auth/VerifyEmail.vue') },
-  { path: '/checkout', name: 'checkout', component: () => import('../views/Checkout.vue'), meta: { requiresAuth: true } },
-  { path: '/pedido-confirmado/:id', name: 'order-confirmation', component: () => import('../views/OrderConfirmation.vue'), meta: { requiresAuth: true } },
-  { path: '/dashboard', name: 'dashboard', component: () => import('../views/admin/Dashboard.vue'), meta: { requiresAuth: true, roles: ['admin', 'presidente'] } },
-  { path: '/mi-perfil', name: 'profile', component: () => import('../views/Profile.vue'), meta: { requiresAuth: true } },
+  { path: '/', name: 'home', component: Home, meta: { title: 'Inicio' } },
+  { path: '/catalogo', name: 'catalog', component: Catalog, meta: { title: 'Catalogo' } },
+  { path: '/producto/:slug', name: 'product-detail', component: ProductDetail, meta: { title: 'Producto' } },
+  { path: '/carrito', name: 'cart', component: () => import('../views/Cart.vue'), meta: { title: 'Carrito' } },
+  { path: '/nosotros', name: 'nosotros', component: () => import('../views/Nosotros.vue'), meta: { title: 'Nosotros' } },
+  { path: '/contacto', name: 'contact', component: () => import('../views/Contact.vue'), meta: { title: 'Contacto' } },
+  { path: '/preguntas-frecuentes', name: 'faq', component: () => import('../views/FAQ.vue'), meta: { title: 'Preguntas Frecuentes' } },
+  { path: '/login', name: 'login', component: () => import('../views/auth/Login.vue'), meta: { title: 'Ingresar' } },
+  { path: '/registro', name: 'register', component: () => import('../views/auth/Register.vue'), meta: { title: 'Registrarse' } },
+  { path: '/terminos-y-condiciones', name: 'terms', component: () => import('../views/legal/TermsConditions.vue'), meta: { title: 'Terminos y Condiciones' } },
+  { path: '/politica-de-privacidad', name: 'privacy', component: () => import('../views/legal/PrivacyPolicy.vue'), meta: { title: 'Politica de Privacidad' } },
+  { path: '/politica-de-devoluciones', name: 'returns', component: () => import('../views/legal/ReturnsPolicy.vue'), meta: { title: 'Politica de Devoluciones' } },
+  { path: '/recuperar-contrasena', name: 'forgot-password', component: () => import('../views/auth/ForgotPassword.vue'), meta: { title: 'Recuperar Contrasena' } },
+  { path: '/restablecer-contrasena/:token', name: 'reset-password', component: () => import('../views/auth/ResetPassword.vue'), meta: { title: 'Restablecer Contrasena' } },
+  { path: '/verificar-email', name: 'verify-email', component: () => import('../views/auth/VerifyEmail.vue'), meta: { title: 'Verificar Email' } },
+  { path: '/favoritos', name: 'wishlist', component: () => import('../views/Wishlist.vue'), meta: { requiresAuth: true, title: 'Mis Favoritos' } },
+  { path: '/checkout', name: 'checkout', component: () => import('../views/Checkout.vue'), meta: { requiresAuth: true, title: 'Finalizar Compra' } },
+  { path: '/pedido-confirmado/:id', name: 'order-confirmation', component: () => import('../views/OrderConfirmation.vue'), meta: { requiresAuth: true, title: 'Pedido Confirmado' } },
+  { path: '/dashboard', name: 'dashboard', component: () => import('../views/admin/Dashboard.vue'), meta: { requiresAuth: true, roles: ['admin', 'presidente'], title: 'Panel Admin' } },
+  { path: '/mi-perfil', name: 'profile', component: () => import('../views/Profile.vue'), meta: { requiresAuth: true, title: 'Mi Perfil' } },
 ]
 
 const router = createRouter({
@@ -44,6 +46,11 @@ router.beforeEach((to, from, next) => {
   }
 
   next()
+})
+
+router.afterEach((to) => {
+  const base = 'Artesanos de Catriel'
+  document.title = to.meta.title ? `${to.meta.title} | ${base}` : base
 })
 
 export default router

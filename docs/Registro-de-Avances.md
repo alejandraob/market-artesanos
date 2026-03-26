@@ -214,6 +214,65 @@ Documento que registra las tareas completadas, correcciones realizadas y mejoras
 
 ---
 
+## Fase 3 - Mejoras de conversion
+
+### 3.1 FAQ / Preguntas frecuentes (COMPLETADO - 26/03/2026)
+
+Pagina `/preguntas-frecuentes` con 11 preguntas en acordeon expandible. Temas: productos a pedido, tiempos, personalizacion, envios, cancelaciones, defectos, medios de pago. Link a contacto al final. Agregado al footer.
+
+### 3.2 SEO basico (COMPLETADO - 26/03/2026)
+
+- `index.html`: lang="es", meta description, keywords, Open Graph tags, favicon con logo
+- Titulos dinamicos por pagina via `router.afterEach` ("Catalogo | Artesanos de Catriel")
+
+### 3.3 Sistema de resenas/valoraciones (COMPLETADO - 26/03/2026)
+
+- Modelo `Review` (user_id, product_id, rating 1-5, comment). Una resena por usuario por producto.
+- Endpoints: `GET /products/{id}/reviews`, `POST /products/{id}/reviews` (auth), `DELETE /reviews/{id}`
+- ProductDetail: promedio de estrellas, formulario con estrellas clickeables + comentario, lista de resenas con nombre, fecha y rating
+
+### 3.4 Lista de deseos / Wishlist (COMPLETADO - 26/03/2026)
+
+- Modelo `Wishlist` (user_id, product_id, unique)
+- Endpoints: `GET /wishlist`, `POST /wishlist/toggle` (auth)
+- Store Pinia `wishlist.js` con fetch, toggle, isInWishlist
+- Boton de corazon en cada ProductCard (relleno rojo si esta en favoritos)
+- Pagina `/favoritos` con grid de productos favoritos y boton para quitar
+- Se carga automaticamente al iniciar si el usuario esta autenticado
+
+### 3.5 Cupones y descuentos
+
+**Estado:** Pendiente (requiere definicion de reglas de negocio)
+
+### 3.6 Compartir producto en redes (COMPLETADO - 26/03/2026)
+
+Botones de WhatsApp y Facebook en ProductDetail para compartir el link del producto.
+
+### 3.7 Limpieza de carritos abandonados (COMPLETADO - 26/03/2026)
+
+Comando artisan `php artisan carts:clean --days=7`. Elimina carritos de invitado sin actividad por X dias. Puede programarse con cron.
+
+### 3.8 Prevenir doble click (COMPLETADO - 26/03/2026)
+
+Todos los botones de accion ya tienen `:disabled` con variable de estado (`loading`, `processing`, `saving`, etc.) que se activa mientras se procesa la solicitud.
+
+### 3.9 Ojito para visualizar contrasena (COMPLETADO - 26/03/2026)
+
+Componente `PasswordInput.vue` reutilizable con toggle mostrar/ocultar. Aplicado en Login, Register y Profile.
+
+### 3.10 Reemplazar alert() nativos por toasts (COMPLETADO - 26/03/2026)
+
+- Store `toast.js` con show(), success(), error(), info()
+- Componente `AppToast.vue` fijo en esquina superior derecha con animacion slide-in
+- Estilos por tipo: verde (success), rojo (error), marron (info)
+- Reemplazados todos los `alert()` de Dashboard.vue y ProductDetail.vue
+
+### 3.11 Imagenes optimizadas
+
+**Estado:** Pendiente
+
+---
+
 ## Correcciones y mejoras aplicadas
 
 ### Fix: Admin/Presidente veia pedidos de otros usuarios en Mi Perfil (25/03/2026)

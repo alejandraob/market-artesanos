@@ -543,6 +543,9 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import api, { storageUrl } from '../../utils/api'
+import { useToastStore } from '../../stores/toast'
+
+const toastStore = useToastStore()
 
 const auth = useAuthStore()
 
@@ -614,7 +617,7 @@ const updateOrderStatus = async (order) => {
     orderUpdateMsg.value = order.id
     setTimeout(() => { if (orderUpdateMsg.value === order.id) orderUpdateMsg.value = null }, 3000)
   } catch (error) {
-    alert('Error al actualizar el pedido')
+    toastStore.error('Error al actualizar el pedido')
   } finally {
     savingOrder.value = null
   }
@@ -664,7 +667,7 @@ const deleteCategory = async (id) => {
     await api.delete(`/categories/${id}`)
     await fetchAll()
   } catch (error) {
-    alert(error.response?.data?.message || 'Error al eliminar categoria')
+    toastStore.error(error.response?.data?.message || 'Error al eliminar categoria')
   }
 }
 
@@ -773,7 +776,7 @@ const deleteArtisan = async (id) => {
     await api.delete(`/artisans/${id}`)
     await fetchAll()
   } catch (error) {
-    alert('Error al eliminar artesano')
+    toastStore.error('Error al eliminar artesano')
   }
 }
 
@@ -841,7 +844,7 @@ const toggleProductActive = async (prod) => {
     await api.patch(`/products/${prod.id}/toggle-active`)
     prod.is_active = !prod.is_active
   } catch (error) {
-    alert('Error al cambiar estado')
+    toastStore.error('Error al cambiar estado')
   }
 }
 
@@ -851,7 +854,7 @@ const deleteProduct = async (id) => {
     await api.delete(`/products/${id}`)
     await fetchAll()
   } catch (error) {
-    alert('Error al eliminar producto')
+    toastStore.error('Error al eliminar producto')
   }
 }
 

@@ -29,6 +29,7 @@
             <li><router-link to="/catalogo" class="hover:text-white transition-colors">Catalogo</router-link></li>
             <li><router-link to="/nosotros" class="hover:text-white transition-colors">Nosotros</router-link></li>
             <li><router-link to="/contacto" class="hover:text-white transition-colors">Contacto</router-link></li>
+            <li><router-link to="/preguntas-frecuentes" class="hover:text-white transition-colors">Preguntas Frecuentes</router-link></li>
           </ul>
         </div>
         <div>
