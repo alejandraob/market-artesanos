@@ -2,7 +2,7 @@
   <div class="min-h-screen flex flex-col bg-artisan-bg selection:bg-artisan-accent selection:text-white font-sans text-artisan-dark">
     <AppNavbar />
 
-    <main class="flex-grow container mx-auto px-4 py-12">
+    <main class="flex-grow container mx-auto px-4 py-12" style="min-height: calc(100vh - 96px - 320px)">
       <router-view v-slot="{ Component }">
         <transition name="fade" mode="out-in">
           <component :is="Component" />

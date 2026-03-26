@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-artisan-dark text-white border-t-8 border-artisan-accent pt-16 pb-10">
+  <footer class="bg-artisan-dark text-white border-t-8 border-artisan-accent pt-16 pb-10" style="contain: layout style">
     <div class="max-w-7xl mx-auto px-4">
 
       <!-- Fila superior: Logo + redes -->
