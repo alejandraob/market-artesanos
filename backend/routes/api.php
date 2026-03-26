@@ -13,13 +13,13 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
 
 // Public Endpoints
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('/contact', [ContactController::class, 'send']);
-Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:3,1');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1');
+Route::post('/contact', [ContactController::class, 'send'])->middleware('throttle:3,1');
+Route::post('/verify-email', [AuthController::class, 'verifyEmail'])->middleware('throttle:5,1');
 Route::get('/products/{productId}/reviews', [ReviewController::class, 'index']);
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);

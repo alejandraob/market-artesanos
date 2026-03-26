@@ -54,6 +54,8 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'image_files' => 'nullable|array|max:10',
+            'image_files.*' => 'image|mimes:jpeg,jpg,png,webp|max:5120',
         ]);
 
         $data = $request->all();
@@ -90,6 +92,11 @@ class ProductController extends Controller
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
+        $request->validate([
+            'image_files' => 'nullable|array|max:10',
+            'image_files.*' => 'image|mimes:jpeg,jpg,png,webp|max:5120',
+        ]);
+
         $data = $request->all();
         if (isset($data['name'])) {
             $data['slug'] = Str::slug($data['name']) . '-' . uniqid();
@@ -123,7 +130,7 @@ class ProductController extends Controller
     public function shippingRates(Request $request, CorreoArgentinoService $caService)
     {
         $request->validate([
-            'postal_code' => 'required|string',
+            'postal_code' => 'required|string|regex:/^[0-9]{4,8}$/',
             'product_id' => 'required|exists:products,id',
         ]);
 

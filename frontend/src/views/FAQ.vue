@@ -15,7 +15,7 @@
           </svg>
         </button>
         <div v-if="open === idx" class="px-6 pb-5 text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-4">
-          <p v-html="item.answer"></p>
+          <p v-html="sanitize(item.answer)"></p>
         </div>
       </div>
     </div>
@@ -35,6 +35,25 @@ const open = ref(null)
 
 const toggle = (idx) => {
   open.value = open.value === idx ? null : idx
+}
+
+const sanitize = (html) => {
+  const div = document.createElement('div')
+  div.innerHTML = html
+  div.querySelectorAll('*').forEach(el => {
+    const allowed = ['STRONG', 'B', 'I', 'EM', 'A', 'BR', 'P']
+    if (!allowed.includes(el.tagName)) {
+      el.replaceWith(...el.childNodes)
+      return
+    }
+    // Solo permitir href en <a> y quitar el resto de atributos
+    const attrs = [...el.attributes]
+    attrs.forEach(attr => {
+      if (el.tagName === 'A' && (attr.name === 'href' || attr.name === 'class')) return
+      el.removeAttribute(attr.name)
+    })
+  })
+  return div.innerHTML
 }
 
 const faqs = [

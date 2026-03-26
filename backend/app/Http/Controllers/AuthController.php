@@ -19,7 +19,7 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|regex:/[a-z]/|regex:/[0-9]/|confirmed',
         ]);
 
         $user = User::create([
@@ -133,7 +133,7 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|email',
             'token' => 'required|string',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|regex:/[a-z]/|regex:/[0-9]/|confirmed',
         ]);
 
         $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
@@ -163,7 +163,13 @@ class AuthController extends Controller
     {
         if ($user->email_verified_at) return;
 
-        $token = hash('sha256', $user->id . $user->email . config('app.key'));
+        $token = Str::random(64);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => 'verify_' . $user->email],
+            ['token' => Hash::make($token), 'created_at' => now()]
+        );
+
         $verifyUrl = config('app.frontend_url') . '/verificar-email?id=' . $user->id . '&token=' . $token;
 
         Mail::send('emails.verify-email', ['user' => $user, 'verifyUrl' => $verifyUrl], function ($msg) use ($user) {
@@ -179,10 +185,16 @@ class AuthController extends Controller
         ]);
 
         $user = User::findOrFail($request->id);
-        $expectedToken = hash('sha256', $user->id . $user->email . config('app.key'));
 
-        if ($request->token !== $expectedToken) {
+        $record = DB::table('password_reset_tokens')->where('email', 'verify_' . $user->email)->first();
+
+        if (!$record || !Hash::check($request->token, $record->token)) {
             return response()->json(['message' => 'Token de verificacion invalido.'], 400);
+        }
+
+        if (now()->diffInHours($record->created_at) > 48) {
+            DB::table('password_reset_tokens')->where('email', 'verify_' . $user->email)->delete();
+            return response()->json(['message' => 'El enlace ha expirado. Solicita uno nuevo.'], 400);
         }
 
         if ($user->email_verified_at) {
@@ -190,6 +202,7 @@ class AuthController extends Controller
         }
 
         $user->update(['email_verified_at' => now()]);
+        DB::table('password_reset_tokens')->where('email', 'verify_' . $user->email)->delete();
 
         return response()->json(['message' => 'Email verificado correctamente.']);
     }

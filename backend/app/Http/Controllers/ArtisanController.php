@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ArtisanController extends Controller
 {
@@ -45,13 +46,13 @@ class ArtisanController extends Controller
             'specialty' => 'required|string|max:255',
             'bio' => 'nullable|string',
             'location' => 'nullable|string|max:255',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make('artesano1234'),
+            'password' => Hash::make(Str::random(16)),
             'role' => 'cliente',
             'phone' => $request->phone,
         ]);
@@ -86,7 +87,7 @@ class ArtisanController extends Controller
             'specialty' => 'sometimes|string|max:255',
             'bio' => 'nullable|string',
             'location' => 'nullable|string|max:255',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
             'is_active' => 'sometimes|boolean',
         ]);
 

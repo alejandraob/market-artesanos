@@ -15,6 +15,11 @@ class CartController extends Controller
         $user_id = auth('sanctum')->id();
         $session_id = $request->header('X-Session-Id');
 
+        // Validar formato UUID del session ID
+        if ($session_id && !preg_match('/^[a-f0-9\-]{36}$/', $session_id)) {
+            $session_id = null;
+        }
+
         if (!$user_id && !$session_id) {
             $session_id = Str::uuid()->toString();
         }
