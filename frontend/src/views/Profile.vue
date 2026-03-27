@@ -87,7 +87,7 @@
           <div class="space-y-2 mb-4">
             <div v-for="item in order.items" :key="item.id" class="flex items-center gap-3 text-sm">
               <img
-                :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/40x40?text=...'"
+                :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : '/placeholder.svg'"
                 :alt="item.product?.name"
                 class="w-10 h-10 rounded-lg object-cover"
                 loading="lazy" decoding="async"

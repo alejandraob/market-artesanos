@@ -12,7 +12,7 @@ const api = axios.create({
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000'
 
 export const storageUrl = (path) => {
-  if (!path) return 'https://placehold.co/400x300?text=Sin+Imagen'
+  if (!path) return '/placeholder.svg'
   if (path.startsWith('http')) return path
   return `${BACKEND_URL}/storage/${path}`
 }

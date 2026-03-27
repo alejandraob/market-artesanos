@@ -2,7 +2,7 @@
   <div class="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full relative">
     <div class="relative aspect-[4/5] overflow-hidden">
       <img
-        :src="product.images ? storageUrl(product.images[0]) : 'https://placehold.co/400x500?text=Artesanía'"
+        :src="product.images ? storageUrl(product.images[0]) : '/placeholder.svg'"
         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
         :alt="product.name"
         loading="lazy"

@@ -169,7 +169,7 @@
               <tr v-for="prod in allProducts" :key="prod.id" class="hover:bg-gray-50/50 transition-colors">
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
-                    <img :src="prod.images?.length ? storageUrl(prod.images[0]) : 'https://placehold.co/40x40?text=...'" class="w-10 h-10 rounded-lg object-cover" />
+                    <img :src="prod.images?.length ? storageUrl(prod.images[0]) : '/placeholder.svg'" class="w-10 h-10 rounded-lg object-cover" />
                     <div>
                       <p class="font-semibold text-sm">{{ prod.name }}</p>
                     </div>
@@ -284,7 +284,7 @@
                 <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Productos</h4>
                 <div class="space-y-2">
                   <div v-for="item in order.items" :key="item.id" class="flex items-center gap-3 text-sm">
-                    <img :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : 'https://placehold.co/40x40'" class="w-10 h-10 rounded-lg object-cover" />
+                    <img :src="item.product?.images?.length ? storageUrl(item.product.images[0]) : '/placeholder.svg'" class="w-10 h-10 rounded-lg object-cover" />
                     <span class="flex-1">{{ item.product?.name || 'Producto eliminado' }}</span>
                     <span class="text-gray-500">x{{ item.quantity }}</span>
                     <span class="font-bold">${{ item.unit_price }}</span>

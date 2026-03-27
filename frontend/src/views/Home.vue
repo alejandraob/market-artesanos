@@ -2,7 +2,7 @@
   <div class="space-y-32">
     <!-- Premium Hero Section -->
     <section class="relative min-h-[80vh] flex items-center overflow-hidden rounded-[4rem] bg-white shadow-2xl border border-gray-100 group">
-      <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1459411552884-8419124cb1bc?q=80&w=2000')] bg-cover bg-center opacity-10 group-hover:scale-105 transition-transform duration-1000"></div>
+      <div class="absolute inset-0 bg-gradient-to-br from-artisan-bg via-white to-artisan-accent/5 opacity-50 group-hover:scale-105 transition-transform duration-1000"></div>
       
       <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 p-12 md:p-24 items-center w-full">
         <div class="space-y-8">
