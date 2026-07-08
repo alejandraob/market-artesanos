@@ -12,7 +12,7 @@
       <router-link to="/catalogo" class="btn-primary inline-block px-8 py-3">Volver al Catalogo</router-link>
     </div>
 
-    <!-- Paso de pago simulado -->
+    <!-- Paso de confirmacion / pago a coordinar -->
     <div v-else-if="step === 'payment'" class="max-w-lg mx-auto space-y-6">
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
         <div class="w-16 h-16 mx-auto bg-artisan-accent/10 rounded-full flex items-center justify-center mb-4">
@@ -20,12 +20,12 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
           </svg>
         </div>
-        <h2 class="text-2xl font-black text-artisan-dark mb-2">Procesando Pago</h2>
-        <p class="text-gray-500 mb-6">Total a pagar: <strong class="text-artisan-dark text-xl">${{ total.toFixed(2) }}</strong></p>
+        <h2 class="text-2xl font-black text-artisan-dark mb-2">Confirmar pedido</h2>
+        <p class="text-gray-500 mb-6">Total del pedido: <strong class="text-artisan-dark text-xl">${{ total.toFixed(2) }}</strong></p>
 
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-left">
-          <p class="text-amber-800 text-sm font-semibold">Modo de prueba</p>
-          <p class="text-amber-700 text-sm mt-1">La pasarela de pago PayWay se encuentra en proceso de integracion. Al presionar "Simular Pago" se creara el pedido como si el pago se hubiera realizado correctamente.</p>
+          <p class="text-amber-800 text-sm font-semibold">Pago a coordinar</p>
+          <p class="text-amber-700 text-sm mt-1">Por el momento no procesamos pago online. Al confirmar, registramos tu pedido y nos comunicamos para coordinar el pago (transferencia bancaria o efectivo).</p>
         </div>
 
         <div class="space-y-3">
@@ -34,7 +34,7 @@
             :disabled="processing"
             class="btn-primary w-full py-4 text-lg rounded-full"
           >
-            {{ processing ? 'Procesando...' : 'Simular Pago' }}
+            {{ processing ? 'Confirmando...' : 'Confirmar pedido' }}
           </button>
           <button @click="step = 'form'" class="w-full py-3 text-sm text-gray-500 hover:text-artisan-dark transition-colors font-medium">
             Volver a los datos de envio
@@ -96,8 +96,8 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <h2 class="font-bold text-lg mb-4">Costo de envio</h2>
 
-          <div v-if="!form.shipping_postal_code" class="text-gray-400 text-sm">
-            Completa el codigo postal arriba para calcular el envio.
+          <div v-if="!form.shipping_province" class="text-gray-400 text-sm">
+            Selecciona la provincia arriba para calcular el envio.
           </div>
 
           <div v-else>
@@ -109,22 +109,21 @@
               {{ calculandoEnvio ? 'Calculando...' : 'Calcular costo de envio' }}
             </button>
 
-            <div v-if="shippingRates && shippingRates.length" class="mt-4 space-y-2">
-              <label
-                v-for="(rate, idx) in shippingRates"
-                :key="idx"
-                class="flex items-center gap-4 bg-gray-50 border rounded-xl p-4 cursor-pointer transition-colors"
-                :class="selectedShipping === idx ? 'border-artisan-accent bg-amber-50' : 'border-gray-200 hover:border-gray-300'"
+            <div v-if="shippingQuote" class="mt-4 space-y-2">
+              <div
+                v-for="grupo in shippingQuote.artisans"
+                :key="grupo.artisan_id"
+                class="bg-gray-50 border border-gray-200 rounded-xl p-4"
               >
-                <input type="radio" :value="idx" v-model="selectedShipping" class="accent-artisan-accent" />
-                <div class="flex-grow">
-                  <p class="font-bold text-sm">{{ rate.serviceDescription || rate.serviceType }}</p>
-                  <p v-if="rate.deliveryTime" class="text-xs text-gray-500">Entrega estimada: {{ rate.deliveryTime }} dias habiles</p>
-                </div>
-                <span class="font-black text-lg text-amber-700">${{ rate.price || rate.total }}</span>
-              </label>
+                <p class="font-bold text-sm">{{ grupo.artisan_name }}</p>
+                <p class="text-xs text-gray-500 mb-2">{{ grupo.items.map(i => `${i.name} x${i.quantity}`).join(', ') }}</p>
+                <p v-if="grupo.pending" class="text-amber-700 text-sm font-semibold">
+                  El artesano se comunicara para informarte los costos de envio
+                </p>
+                <p v-else class="font-black text-lg text-amber-700">${{ grupo.cost.toFixed(2) }}</p>
+              </div>
 
-              <p v-if="usandoSimulado" class="text-xs text-amber-600 mt-2 italic">* Tarifas estimadas (modo simulacion). El costo real se calculara con Correo Argentino al momento del envio.</p>
+              <p v-if="shippingQuote.has_pending" class="text-xs text-gray-500 mt-2 italic">* El total muestra solo los envios ya calculados; los pendientes se coordinan directamente con el artesano.</p>
             </div>
 
             <p v-if="shippingError" class="mt-3 text-red-600 text-sm font-medium">{{ shippingError }}</p>
@@ -228,6 +227,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useCartStore } from '../stores/cart'
 import api, { storageUrl } from '../utils/api'
+import { provincias } from '../utils/provincias'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -257,10 +257,8 @@ const resendVerification = async () => {
 }
 
 const calculandoEnvio = ref(false)
-const shippingRates = ref(null)
+const shippingQuote = ref(null)
 const shippingError = ref('')
-const selectedShipping = ref(null)
-const usandoSimulado = ref(false)
 
 const errors = reactive({})
 
@@ -273,27 +271,13 @@ const form = reactive({
   shipping_phone: '',
 })
 
-const provincias = [
-  'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
-  'Corrientes', 'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja',
-  'Mendoza', 'Misiones', 'Neuquén', 'Río Negro', 'Salta', 'San Juan',
-  'San Luis', 'Santa Cruz', 'Santa Fe', 'Santiago del Estero',
-  'Tierra del Fuego', 'Tucumán'
-]
-
-const shippingSimuladas = [
-  { serviceDescription: 'Envio estandar (Correo Argentino)', deliveryTime: '5 a 7', price: 8500 },
-  { serviceDescription: 'Envio expreso (Correo Argentino)', deliveryTime: '2 a 4', price: 14500 },
-]
-
 const subtotal = computed(() => {
   return cartItems.value.reduce((acc, item) => acc + (item.product?.price * item.quantity), 0)
 })
 
 const shippingCostSelected = computed(() => {
-  if (selectedShipping.value === null || !shippingRates.value) return null
-  const rate = shippingRates.value[selectedShipping.value]
-  return parseFloat(rate.price || rate.total || 0)
+  if (!shippingQuote.value) return null
+  return shippingQuote.value.total_cost
 })
 
 const total = computed(() => {
@@ -326,30 +310,18 @@ onMounted(async () => {
 })
 
 const calcularEnvio = async () => {
-  if (!form.shipping_postal_code) return
+  if (!form.shipping_province) return
   calculandoEnvio.value = true
-  shippingRates.value = null
+  shippingQuote.value = null
   shippingError.value = ''
-  selectedShipping.value = null
-  usandoSimulado.value = false
 
   try {
-    const firstProduct = cartItems.value[0]?.product
-    const res = await api.post('/shipping-rates', {
-      postal_code: form.shipping_postal_code,
-      product_id: firstProduct?.id
+    const res = await api.post('/cart/shipping-quote', {
+      shipping_province: form.shipping_province,
     })
-    if (res.data && res.data.length > 0) {
-      shippingRates.value = res.data
-    } else {
-      // Sin resultados de la API, usar simuladas
-      shippingRates.value = shippingSimuladas
-      usandoSimulado.value = true
-    }
+    shippingQuote.value = res.data
   } catch (error) {
-    // API no disponible, usar tarifas simuladas
-    shippingRates.value = shippingSimuladas
-    usandoSimulado.value = true
+    shippingError.value = error.response?.data?.message || 'No se pudo calcular el envio. Intenta nuevamente.'
   } finally {
     calculandoEnvio.value = false
   }
@@ -386,15 +358,19 @@ const irAlPago = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+// Integracion de pago (pendiente, sin credenciales todavia):
+// - MercadoPago Checkout Pro: crear una preferencia desde el backend (paquete
+//   mercadopago/dx-php ya instalado) y redirigir a su init_point en vez de
+//   llamar directo a /orders/checkout como se hace hoy. El estado de la orden
+//   se actualizaria via webhook, no aca.
+// - PayWay: ver Guia-Integracion-PayWay.md (tokenizacion de tarjeta en el
+//   frontend con su SDK JS, cobro server-side con el token resultante).
 const procesarPago = async () => {
   processing.value = true
   checkoutError.value = ''
 
   try {
-    const res = await api.post('/orders/checkout', {
-      ...form,
-      shipping_cost: shippingCostSelected.value,
-    })
+    const res = await api.post('/orders/checkout', form)
 
     cartStore.clear()
     router.push({ name: 'order-confirmation', params: { id: res.data.id } })

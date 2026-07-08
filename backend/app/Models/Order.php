@@ -16,12 +16,17 @@ class Order extends Model
         'payment_id',
         'shipping_tracking',
         'shipping_cost',
+        'shipping_pending',
         'shipping_name',
         'shipping_address',
         'shipping_city',
         'shipping_province',
         'shipping_postal_code',
         'shipping_phone',
+    ];
+
+    protected $casts = [
+        'shipping_pending' => 'boolean',
     ];
 
     public function user()

@@ -8,7 +8,7 @@ use App\Models\Cart;
 use App\Mail\OrderConfirmedMail;
 use App\Mail\NewOrderForArtisanMail;
 use App\Mail\OrderStatusChangedMail;
-use App\Services\CorreoArgentinoService;
+use App\Services\ShippingCalculatorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -31,7 +31,7 @@ class OrderController extends Controller
         return response()->json($query->orderByDesc('created_at')->get());
     }
 
-    public function checkout(Request $request, CorreoArgentinoService $caService)
+    public function checkout(Request $request, ShippingCalculatorService $shippingCalculator)
     {
         if (!$request->user()->email_verified_at) {
             return response()->json(['message' => 'Debes verificar tu email antes de realizar una compra.'], 403);
@@ -44,7 +44,6 @@ class OrderController extends Controller
             'shipping_province' => 'required|string|max:255',
             'shipping_postal_code' => 'required|string|max:10',
             'shipping_phone' => 'required|string|max:20',
-            'shipping_cost' => 'required|numeric|min:0',
         ]);
 
         $user = $request->user();
@@ -54,21 +53,28 @@ class OrderController extends Controller
             return response()->json(['message' => 'Carrito vacío'], 400);
         }
 
-        return DB::transaction(function() use ($user, $cart, $caService, $request) {
-            $items = $cart->items()->with('product.artisan.user')->get();
+        // Pago a coordinar: por ahora la orden se crea directamente en 'pending'
+        // y el pago se coordina fuera del sistema (transferencia/efectivo). Cuando
+        // haya credenciales de MercadoPago o PayWay, el cobro se procesaria aca,
+        // antes de crear la orden (o la orden se crea igual y se marca 'paid' via
+        // webhook, segun el gateway).
+        return DB::transaction(function() use ($user, $cart, $shippingCalculator, $request) {
+            $items = $cart->items()->with('product.category', 'product.artisan.user')->get();
 
             $subtotal = 0;
             foreach ($items as $item) {
                 $subtotal += $item->quantity * $item->product->price;
             }
 
-            $shippingCost = $request->input('shipping_cost', 0);
+            $shippingQuote = $shippingCalculator->calculate($items, $request->input('shipping_province'));
+            $shippingCost = $shippingQuote['total_cost'];
 
             $order = Order::create([
                 'user_id' => $user->id,
                 'total' => $subtotal + $shippingCost,
                 'status' => 'pending',
                 'shipping_cost' => $shippingCost,
+                'shipping_pending' => $shippingQuote['has_pending'],
                 'shipping_name' => $request->input('shipping_name'),
                 'shipping_address' => $request->input('shipping_address'),
                 'shipping_city' => $request->input('shipping_city'),
@@ -84,24 +90,6 @@ class OrderController extends Controller
                     'quantity' => $item->quantity,
                     'unit_price' => $item->product->price
                 ]);
-            }
-
-            try {
-                $caOrder = $caService->createOrder([
-                    'extOrderId' => $order->id,
-                    'orderNumber' => 'MARKET-' . $order->id,
-                    'recipient' => [
-                        'name' => $request->input('shipping_name'),
-                        'email' => $user->email,
-                        'phone' => $request->input('shipping_phone'),
-                    ],
-                ]);
-
-                if ($caOrder && isset($caOrder['orderNumber'])) {
-                    $order->update(['shipping_tracking' => $caOrder['orderNumber']]);
-                }
-            } catch (\Exception $e) {
-                // El envio se gestionara manualmente si falla la API
             }
 
             $cart->items()->delete();
@@ -177,21 +165,5 @@ class OrderController extends Controller
         }
 
         return response()->json($order);
-    }
-
-    public function getShippingRates(Request $request, CorreoArgentinoService $caService)
-    {
-        $request->validate(['postal_code' => 'required']);
-        
-        $dimensions = [
-            'weight' => 1.0,
-            'height' => 10,
-            'length' => 10,
-            'width' => 10,
-        ];
-
-        $rates = $caService->getRates($request->postal_code, $dimensions);
-        
-        return response()->json($rates);
     }
 }

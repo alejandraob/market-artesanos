@@ -22,6 +22,10 @@ Tu pedido fue registrado correctamente. A continuacion te dejamos el detalle:
 {{ $order->shipping_city }}, {{ $order->shipping_province }} - CP {{ $order->shipping_postal_code }}<br>
 Tel: {{ $order->shipping_phone }}
 
+## Coordinacion de pago
+
+Por el momento no procesamos pago online. Nos vamos a comunicar con vos para coordinar el pago (transferencia bancaria o efectivo). Tu pedido queda registrado como pendiente de pago hasta ese momento.
+
 ## Contacta al artesano
 
 Los productos son elaborados a pedido. Comunicate con el artesano para coordinar los detalles (color, material, medidas, personalizacion):

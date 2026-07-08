@@ -76,14 +76,12 @@ El proyecto sigue una arquitectura **API-first** con separacion completa entre b
 ## Servicios Externos Integrados
 
 ### Correo Argentino (API de Envios)
-- **Funcion:** Calculo de tarifas de envio y creacion de ordenes de despacho.
-- **Modo:** Sandbox (en desarrollo) / Produccion.
-- **Origen de envio:** CP 8307 (Catriel, Rio Negro).
-- **Servicio implementado:** `App\Services\CorreoArgentinoService`
+- **Estado:** Sin credenciales; reemplazado por un sistema propio de reglas de envio por categoria/artesano (08/07/2026), ver `docs/Registro-de-Avances.md` seccion 4.1.
+- **Servicio:** `App\Services\CorreoArgentinoService` sigue en el codigo, sin uso, por si se retoma con credenciales reales.
 
 ### Mercado Pago
 - **Funcion:** Procesamiento de pagos online.
-- **Estado:** SDK instalado (backend y frontend), integracion en desarrollo.
+- **Estado:** SDK instalado (backend y frontend), sin integrar. Es la alternativa recomendada a PayWay (alta de cuenta self-service, sin vetting comercial). Mientras tanto el pago se coordina manualmente (transferencia/efectivo).
 
 ### Firebase
 - **Funcion:** Notificaciones push a dispositivos.

@@ -387,6 +387,41 @@
           <p class="font-semibold">No hay categorias</p>
         </div>
       </section>
+
+      <!-- ENVIOS -->
+      <section v-if="activeSection === 'envios'">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-black text-artisan-dark">Envios</h1>
+          <button @click="openShippingRuleModal()" class="bg-artisan-brown hover:bg-[#5b3a27] text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors">+ Nueva Regla</button>
+        </div>
+
+        <div class="space-y-4">
+          <div v-for="group in shippingRulesByCategory" :key="group.category.id" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="font-bold text-artisan-dark">{{ group.category.name }}</span>
+              <button @click="openShippingRuleModal(null, group.category.id)" class="text-xs text-artisan-accent font-bold hover:underline">+ Agregar regla</button>
+            </div>
+
+            <div v-if="group.rules.length" class="space-y-2">
+              <div v-for="rule in group.rules" :key="rule.id" class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+                <div>
+                  <span class="font-semibold text-sm text-gray-700">{{ ruleTarget(rule) }}</span>
+                  <span class="text-gray-400 text-xs ml-2">- {{ ruleSummary(rule) }}</span>
+                </div>
+                <div class="flex gap-2">
+                  <button @click="openShippingRuleModal(rule)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">Editar</button>
+                  <button @click="deleteShippingRule(rule.id)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors">Eliminar</button>
+                </div>
+              </div>
+            </div>
+            <p v-else class="text-gray-400 text-sm">Sin reglas configuradas (el envio de esta categoria queda a coordinar por defecto).</p>
+          </div>
+
+          <div v-if="categories.length === 0" class="bg-white rounded-2xl shadow-sm border border-gray-100 text-center py-12 text-gray-400">
+            <p class="font-semibold">Primero crea categorias para poder configurar su envio</p>
+          </div>
+        </div>
+      </section>
     </main>
 
     <!-- MODAL CATEGORIA -->
@@ -413,6 +448,84 @@
           <div class="flex gap-3 pt-2">
             <button type="submit" :disabled="savingCategory" class="btn-primary flex-1 py-3">{{ savingCategory ? 'Guardando...' : 'Guardar' }}</button>
             <button type="button" @click="showCategoryModal = false" class="flex-1 py-3 border-2 border-gray-200 rounded-full font-bold text-gray-500 hover:bg-gray-50 transition-colors">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL REGLA DE ENVIO -->
+    <div v-if="showShippingRuleModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
+      <div class="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+        <h2 class="text-xl font-black mb-6">{{ editingShippingRule ? 'Editar Regla de Envio' : 'Nueva Regla de Envio' }}</h2>
+        <form @submit.prevent="saveShippingRule" class="space-y-4">
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Categoria</label>
+            <select v-model="shippingRuleForm.category_id" class="input-field" required>
+              <option disabled value="">Seleccionar categoria</option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Aplica a</label>
+            <select v-model="shippingRuleForm.applies_to" class="input-field">
+              <option value="todos">Todos los artesanos de esta categoria</option>
+              <option value="artesano">Un artesano especifico</option>
+            </select>
+          </div>
+
+          <div v-if="shippingRuleForm.applies_to === 'artesano'">
+            <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Artesano</label>
+            <select v-model="shippingRuleForm.artisan_id" class="input-field" required>
+              <option disabled value="">Seleccionar artesano</option>
+              <option v-for="art in artisans" :key="art.id" :value="art.id">{{ art.user?.name }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Modo de envio</label>
+            <select v-model="shippingRuleForm.shipping_mode" class="input-field">
+              <option value="coordination">Coordinar con el cliente</option>
+              <option value="flat">Monto fijo</option>
+              <option value="zone">Por provincia</option>
+              <option value="weight">Por peso</option>
+            </select>
+          </div>
+
+          <div v-if="shippingRuleForm.shipping_mode === 'flat'">
+            <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Precio fijo</label>
+            <input v-model.number="shippingRuleForm.shipping_flat_price" type="number" step="0.01" min="0" class="input-field" required />
+          </div>
+
+          <div v-if="shippingRuleForm.shipping_mode === 'zone'" class="space-y-2">
+            <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Precio por provincia</label>
+            <div class="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
+              <div v-for="prov in provincias" :key="prov" class="flex items-center gap-2">
+                <span class="text-xs text-gray-500 w-24 shrink-0 truncate">{{ prov }}</span>
+                <input v-model.number="shippingRuleForm.shipping_zone_rates[prov]" type="number" step="0.01" min="0" class="input-field text-sm py-1.5" placeholder="$" />
+              </div>
+            </div>
+            <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+              <span class="text-xs font-bold text-gray-500 w-24 shrink-0">Por defecto</span>
+              <input v-model.number="shippingRuleForm.shipping_zone_rates._default" type="number" step="0.01" min="0" class="input-field text-sm py-1.5" placeholder="$" />
+            </div>
+          </div>
+
+          <div v-if="shippingRuleForm.shipping_mode === 'weight'" class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Precio base</label>
+              <input v-model.number="shippingRuleForm.shipping_weight_base" type="number" step="0.01" min="0" class="input-field" required />
+            </div>
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Precio por kg</label>
+              <input v-model.number="shippingRuleForm.shipping_weight_rate" type="number" step="0.01" min="0" class="input-field" required />
+            </div>
+          </div>
+
+          <div v-if="shippingRuleError" class="text-red-500 text-sm font-semibold bg-red-50 p-3 rounded-xl">{{ shippingRuleError }}</div>
+          <div class="flex gap-3 pt-2">
+            <button type="submit" :disabled="savingShippingRule" class="btn-primary flex-1 py-3">{{ savingShippingRule ? 'Guardando...' : 'Guardar' }}</button>
+            <button type="button" @click="showShippingRuleModal = false" class="flex-1 py-3 border-2 border-gray-200 rounded-full font-bold text-gray-500 hover:bg-gray-50 transition-colors">Cancelar</button>
           </div>
         </form>
       </div>
@@ -563,6 +676,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import api, { storageUrl } from '../../utils/api'
 import { useToastStore } from '../../stores/toast'
+import { provincias } from '../../utils/provincias'
 
 const toastStore = useToastStore()
 
@@ -574,6 +688,7 @@ const allProducts = ref([])
 const categories = ref([])
 const clients = ref([])
 const orders = ref([])
+const shippingRules = ref([])
 
 // Artisan modal
 const showArtisanModal = ref(false)
@@ -702,7 +817,118 @@ const menuItems = computed(() => [
   { key: 'clientes', label: 'Clientes', icon: '👥', badge: clients.value.length || null },
   { key: 'pedidos', label: 'Pedidos', icon: '🛒', badge: orders.value.length || null },
   { key: 'categorias', label: 'Categorias', icon: '📂', badge: categories.value.length || null },
+  { key: 'envios', label: 'Envios', icon: '🚚', badge: shippingRules.value.length || null },
 ])
+
+// Shipping rules management
+const showShippingRuleModal = ref(false)
+const editingShippingRule = ref(null)
+const savingShippingRule = ref(false)
+const shippingRuleError = ref('')
+const shippingRuleForm = reactive({
+  category_id: '',
+  applies_to: 'todos',
+  artisan_id: '',
+  shipping_mode: 'coordination',
+  shipping_flat_price: null,
+  shipping_zone_rates: {},
+  shipping_weight_base: null,
+  shipping_weight_rate: null,
+})
+
+const shippingRulesByCategory = computed(() => {
+  const map = new Map()
+  for (const cat of categories.value) {
+    map.set(cat.id, { category: cat, rules: [] })
+  }
+  for (const rule of shippingRules.value) {
+    if (!map.has(rule.category_id)) {
+      map.set(rule.category_id, { category: rule.category, rules: [] })
+    }
+    map.get(rule.category_id).rules.push(rule)
+  }
+  return Array.from(map.values())
+})
+
+const ruleTarget = (rule) => rule.artisan_id ? (rule.artisan?.user?.name || 'Artesano') : 'Todos los artesanos'
+
+const ruleSummary = (rule) => {
+  switch (rule.shipping_mode) {
+    case 'flat': return `$${parseFloat(rule.shipping_flat_price).toFixed(2)} fijo`
+    case 'zone': return 'Por provincia'
+    case 'weight': return `$${parseFloat(rule.shipping_weight_base).toFixed(2)} base + $${parseFloat(rule.shipping_weight_rate).toFixed(2)}/kg`
+    default: return 'A coordinar'
+  }
+}
+
+const openShippingRuleModal = (rule = null, categoryId = null) => {
+  editingShippingRule.value = rule
+  shippingRuleError.value = ''
+  if (rule) {
+    shippingRuleForm.category_id = rule.category_id
+    shippingRuleForm.applies_to = rule.artisan_id ? 'artesano' : 'todos'
+    shippingRuleForm.artisan_id = rule.artisan_id || ''
+    shippingRuleForm.shipping_mode = rule.shipping_mode
+    shippingRuleForm.shipping_flat_price = rule.shipping_flat_price
+    shippingRuleForm.shipping_zone_rates = rule.shipping_zone_rates ? { ...rule.shipping_zone_rates } : {}
+    shippingRuleForm.shipping_weight_base = rule.shipping_weight_base
+    shippingRuleForm.shipping_weight_rate = rule.shipping_weight_rate
+  } else {
+    Object.assign(shippingRuleForm, {
+      category_id: categoryId || '',
+      applies_to: 'todos',
+      artisan_id: '',
+      shipping_mode: 'coordination',
+      shipping_flat_price: null,
+      shipping_zone_rates: {},
+      shipping_weight_base: null,
+      shipping_weight_rate: null,
+    })
+  }
+  showShippingRuleModal.value = true
+}
+
+const saveShippingRule = async () => {
+  savingShippingRule.value = true
+  shippingRuleError.value = ''
+  try {
+    const payload = {
+      category_id: shippingRuleForm.category_id,
+      artisan_id: shippingRuleForm.applies_to === 'artesano' ? shippingRuleForm.artisan_id : null,
+      shipping_mode: shippingRuleForm.shipping_mode,
+      shipping_flat_price: shippingRuleForm.shipping_flat_price,
+      shipping_zone_rates: shippingRuleForm.shipping_zone_rates,
+      shipping_weight_base: shippingRuleForm.shipping_weight_base,
+      shipping_weight_rate: shippingRuleForm.shipping_weight_rate,
+    }
+    if (editingShippingRule.value) {
+      await api.put(`/admin/shipping-rules/${editingShippingRule.value.id}`, payload)
+    } else {
+      await api.post('/admin/shipping-rules', payload)
+    }
+    showShippingRuleModal.value = false
+    await fetchAll()
+  } catch (error) {
+    shippingRuleError.value = error.response?.data?.message || 'Error al guardar la regla de envio'
+  } finally {
+    savingShippingRule.value = false
+  }
+}
+
+const deletingShippingRule = ref(false)
+const deleteShippingRule = async (id) => {
+  if (deletingShippingRule.value) return
+  if (!confirm('¿Seguro que deseas eliminar esta regla de envio?')) return
+  deletingShippingRule.value = true
+  try {
+    await api.delete(`/admin/shipping-rules/${id}`)
+    await fetchAll()
+  } catch (error) {
+    toastStore.error(error.response?.data?.message || 'Error al eliminar la regla')
+  } finally {
+    deletingShippingRule.value = false
+  }
+}
 
 const topProducts = computed(() => {
   const productMap = {}
@@ -735,18 +961,20 @@ const topProvinces = computed(() => {
 // Fetch data
 const fetchAll = async () => {
   try {
-    const [resArt, resProd, resCat, resClients, resOrders] = await Promise.all([
+    const [resArt, resProd, resCat, resClients, resOrders, resShipping] = await Promise.all([
       api.get('/admin/artisans'),
       api.get('/admin/products'),
       api.get('/categories'),
       api.get('/admin/clients'),
       api.get('/orders?scope=all'),
+      api.get('/admin/shipping-rules'),
     ])
     artisans.value = resArt.data
     allProducts.value = resProd.data
     categories.value = resCat.data
     clients.value = resClients.data
     orders.value = resOrders.data
+    shippingRules.value = resShipping.data
   } catch (error) {
     console.error('Error loading dashboard data', error)
   }

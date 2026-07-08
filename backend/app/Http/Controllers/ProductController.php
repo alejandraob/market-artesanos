@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Services\CorreoArgentinoService;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -128,41 +127,5 @@ class ProductController extends Controller
     {
         $product->delete();
         return response()->json(null, 204);
-    }
-
-    public function shippingRates(Request $request, CorreoArgentinoService $caService)
-    {
-        $request->validate([
-            'postal_code' => 'required|string|regex:/^[0-9]{4,8}$/',
-            'product_id' => 'required|exists:products,id',
-        ]);
-
-        $product = Product::findOrFail($request->product_id);
-
-        $parcels = [[
-            'weight' => (string) ($product->weight ?? 1000),
-            'dimensions' => [
-                'height' => (string) ($product->height ?? 10),
-                'width' => (string) ($product->width ?? 10),
-                'depth' => (string) ($product->depth ?? 10),
-            ],
-            'declaredValue' => (string) $product->price,
-            'productCategory' => $product->category->name ?? 'Artesanía',
-        ]];
-
-        $originZip = config('services.correo_argentino.origin_zip', '8307');
-
-        $rates = $caService->getRates(
-            $originZip,
-            $request->postal_code,
-            'homeDelivery',
-            $parcels
-        );
-
-        if (!$rates) {
-            return response()->json(['message' => 'No se pudo obtener la cotización'], 503);
-        }
-
-        return response()->json($rates);
     }
 }

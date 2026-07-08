@@ -361,3 +361,40 @@ Se agregaron a la seccion 7 del documento Estado-del-Proyecto.md:
 - #9: Prevenir doble click en botones de accion
 - #10: Ojito para visualizar contrasena en formularios
 - #11: Reemplazar alert() nativos por sistema de notificaciones/toasts de Vue
+
+---
+
+## Fase 4 - Reemplazo de integraciones externas trabadas (08/07/2026)
+
+No se pudieron conseguir las credenciales de Correo Argentino (API PaqAr) ni de PayWay (requiere cuenta comercial con Prisma Medios de Pago). En vez de seguir bloqueados, se reemplazaron ambas por soluciones propias que no dependen de terceros.
+
+### 4.1 Sistema de envio configurable por categoria/artesano (COMPLETADO)
+
+**Backend:**
+- Nueva tabla `shipping_rules`: categoria + artesano (nullable = "todos los artesanos de esa categoria") + modo (`coordination`, `flat`, `zone`, `weight`) + los valores segun el modo (precio fijo, tabla de precios por provincia con default, o base + precio/kg)
+- Modelo `ShippingRule` y `ShippingRuleController` (CRUD, solo admin/presidente)
+- `ShippingCalculatorService`: resuelve la regla efectiva por producto (override del artesano > regla "todos" de la categoria > "a coordinar" si no hay nada configurado) y agrupa el calculo **por artesano** (estilo Mercado Libre): suma el costo de los artesanos calculables y marca aparte los que quedan a coordinar
+- Nuevo endpoint `POST /api/cart/shipping-quote` (reemplaza `POST /api/shipping-rates`, eliminado)
+- `OrderController@checkout` ya no confia en el `shipping_cost` que manda el frontend: lo recalcula siempre server-side con `ShippingCalculatorService` y guarda `shipping_pending` (si algun artesano del pedido quedo a coordinar)
+- Se elimino la llamada a `CorreoArgentinoService` en el checkout y el metodo muerto `OrderController@getShippingRates`. El servicio queda en el codigo sin uso por si se retoma en el futuro.
+
+**Frontend:**
+- Nueva seccion **"Envios"** en el Dashboard: por cada categoria se pueden crear reglas "para todos los artesanos" o para uno especifico, eligiendo el modo y cargando los valores
+- `Checkout.vue`: la cotizacion ahora se pide por provincia (no codigo postal) y muestra el desglose por artesano, con el mensaje "El artesano se comunicara para informarte los costos de envio" para los que quedan pendientes. No bloquea la compra.
+- `OrderConfirmation.vue`: aviso cuando el pedido tiene envios pendientes de coordinar
+- Se elimino el widget de cotizacion por codigo postal en `ProductDetail.vue` (llamaba al endpoint eliminado)
+
+**Archivos creados:** `ShippingRule.php`, `ShippingRuleController.php`, `ShippingCalculatorService.php`, `frontend/src/utils/provincias.js`
+**Archivos modificados:** `CartController.php`, `OrderController.php`, `ProductController.php`, `Order.php`, `api.php`, `Checkout.vue`, `OrderConfirmation.vue`, `ProductDetail.vue`, `Dashboard.vue`
+
+### 4.2 Pago a coordinar (COMPLETADO)
+
+El paso de pago simulado ("Simular Pago", que aparentaba procesar algo con PayWay) se reemplazo por una confirmacion real: el pedido se registra en `pending` y se coordina el pago por fuera (transferencia bancaria o efectivo). El admin lo marca `paid` desde el Dashboard una vez coordinado, lo cual ya dispara el email existente de "pago confirmado".
+
+Se agregaron avisos de "Coordinacion de pago" en `Checkout.vue`, `OrderConfirmation.vue`, el email `order-confirmed.blade.php` y se actualizo la respuesta correspondiente en `FAQ.vue`. Se dejaron comentarios en el codigo (`Checkout.vue` cerca de `procesarPago`, `OrderController@checkout`) marcando el punto de enganche para MercadoPago Checkout Pro (SDK ya instalado, alta sin vetting comercial) o PayWay (`Guia-Integracion-PayWay.md`) cuando haya credenciales.
+
+**Archivos modificados:** `Checkout.vue`, `OrderConfirmation.vue`, `order-confirmed.blade.php`, `FAQ.vue`, `OrderController.php`
+
+### 4.3 Recuperacion del entorno local (incidente, no relacionado con lo anterior)
+
+Durante esta sesion se detecto que, tras una reinstalacion de XAMPP, `backend/.env` habia vuelto a valores de fabrica (`DB_DATABASE=laravel`, mail a `mailpit`, URLs de una IP vieja) y faltaban las carpetas de `storage/` (sin imagenes, sin symlink publico). Se recupero la base `market_artesanos` real y las imagenes de productos/artesanos desde un respaldo de la instalacion anterior de XAMPP, se recrearon las carpetas de `storage` y el symlink, y se corrigieron ambos `.env` (backend y frontend).

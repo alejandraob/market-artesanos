@@ -27,6 +27,14 @@
         <p class="text-green-600 text-sm mt-2">{{ formatDate(order.created_at) }}</p>
       </div>
 
+      <!-- Coordinacion de pago -->
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+        <h2 class="font-bold text-lg text-amber-800 mb-2">Coordinacion de pago</h2>
+        <p class="text-sm text-amber-700">
+          Por el momento no procesamos pago online. Nos vamos a comunicar con vos para coordinar el pago (transferencia bancaria o efectivo). Tu pedido queda registrado como pendiente de pago hasta ese momento.
+        </p>
+      </div>
+
       <!-- Datos de contacto del artesano -->
       <div class="bg-artisan-accent/10 border border-artisan-accent/30 rounded-2xl p-6">
         <h2 class="font-bold text-lg text-artisan-dark mb-2">Contacta al artesano</h2>
@@ -121,6 +129,10 @@
             <span>${{ parseFloat(order.total).toFixed(2) }}</span>
           </div>
         </div>
+
+        <p v-if="order.shipping_pending" class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-700 text-xs font-semibold">
+          Uno o mas artesanos de tu pedido coordinaran el costo de envio directamente con vos.
+        </p>
       </div>
 
       <!-- Direccion de envio -->

@@ -2,6 +2,8 @@
 
 ## Estado: PENDIENTE - Esperando credenciales
 
+**Nota (08/07/2026):** mientras no haya credenciales, el checkout confirma el pedido con "pago a coordinar" (transferencia/efectivo), ver `docs/Registro-de-Avances.md` seccion 4.2. Evaluar tambien **MercadoPago Checkout Pro** como alternativa: el SDK ya esta instalado (`mercadopago/dx-php`, `@mercadopago/sdk-js`) y el alta de cuenta es self-service, sin el vetting comercial que pide PayWay/Prisma.
+
 ---
 
 ## Que es PayWay?

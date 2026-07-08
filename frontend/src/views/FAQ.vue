@@ -99,7 +99,7 @@ const faqs = [
   },
   {
     question: '¿Que medios de pago aceptan?',
-    answer: 'Actualmente estamos integrando la pasarela de pago <strong>PayWay</strong>. Proximamente podras pagar con tarjeta de credito, debito y otros medios.'
+    answer: 'Por el momento coordinamos el pago directamente con vos (<strong>transferencia bancaria o efectivo</strong>) una vez confirmado el pedido. Estamos trabajando para sumar pago online con tarjeta proximamente.'
   },
 ]
 </script>

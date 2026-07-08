@@ -24,7 +24,7 @@ Documento generado el 25/03/2026. Refleja el estado actual del sistema y los pen
 
 ## 1. Resumen del sistema
 
-Market Artesanos es un ecommerce desarrollado para una asociacion de artesanos. Permite a los clientes explorar un catalogo de productos artesanales organizados por categorias, agregar productos al carrito, cotizar envio a traves de Correo Argentino (PaqAr), y realizar pedidos.
+Market Artesanos es un ecommerce desarrollado para una asociacion de artesanos. Permite a los clientes explorar un catalogo de productos artesanales organizados por categorias, agregar productos al carrito, cotizar el envio segun reglas propias configuradas por categoria/artesano, y realizar pedidos con pago a coordinar.
 
 El sistema cuenta con un panel de administracion para gestionar artesanos, productos, categorias, clientes y ordenes.
 
@@ -42,8 +42,8 @@ El sistema cuenta con un panel de administracion para gestionar artesanos, produ
 | Autenticacion | Laravel Sanctum (tokens) |
 | Base de datos | MySQL |
 | Servidor local | XAMPP |
-| Envio | Correo Argentino API PaqAr v2 |
-| Pago (pendiente) | PayWay (en espera de credenciales) |
+| Envio | Reglas propias por categoria/artesano (Correo Argentino en espera de credenciales) |
+| Pago | A coordinar manualmente (PayWay/MercadoPago en espera de credenciales) |
 
 ---
 
@@ -163,7 +163,7 @@ El carrito actualmente no lleva a ninguna pagina de finalizacion de compra. Se n
 
 - Resumen del pedido (productos, cantidades, subtotal)
 - Formulario de datos de envio (nombre, direccion, codigo postal, localidad, provincia, telefono)
-- Cotizacion de envio integrada (ya existe el endpoint `POST /api/shipping-rates`)
+- Cotizacion de envio integrada (endpoint `POST /api/cart/shipping-quote`, reglas propias por categoria/artesano)
 - Informacion sobre tiempos de entrega segun cantidad (ver seccion 4)
 - Boton de confirmar pedido
 - Integracion con medio de pago (pendiente de credenciales, ver seccion 9)
@@ -314,28 +314,23 @@ El campo `stock` existe en la tabla `products` pero segun el modelo de negocio n
 
 ## 9. Dependencias externas en espera
 
-### 9.1 Medio de pago - PayWay
+### 9.1 Medio de pago - PayWay / MercadoPago
 
-**Estado:** En espera de usuario y clave API.
+**Estado:** En espera de credenciales. Resuelto temporalmente con **"pago a coordinar"** (08/07/2026).
 
-El SDK de MercadoPago esta instalado (`mercadopago/dx-php`) pero se decidio usar PayWay. La guia de integracion esta documentada en `Guia-Integracion-PayWay.md`.
+No se pudo conseguir la cuenta comercial de PayWay (requiere aprobacion de Prisma Medios de Pago). Mientras tanto, el checkout confirma el pedido con `status=pending` y avisa al cliente (en el checkout, en `OrderConfirmation.vue` y en el email de confirmacion) que el pago se coordina por fuera del sistema (transferencia bancaria o efectivo). El admin marca el pedido como `paid` manualmente desde el Dashboard una vez coordinado, lo cual ya dispara el email de "pago confirmado" existente.
 
-Una vez recibidas las credenciales:
-- Integrar el SDK de PayWay en el backend
-- Crear endpoint de procesamiento de pago
-- Integrar formulario de pago en la vista de checkout
-- Manejar callbacks de confirmacion/rechazo
+El SDK de MercadoPago esta instalado (`mercadopago/dx-php`, `@mercadopago/sdk-js`) y es la alternativa recomendada a PayWay porque el alta de cuenta es self-service (sin vetting comercial). Quedaron comentarios en el codigo (`Checkout.vue` cerca de `procesarPago`, `OrderController@checkout`) marcando el punto exacto de enganche para cuando se retome:
+- MercadoPago Checkout Pro: crear preferencia desde el backend, redirigir a su `init_point`, confirmar el pago via webhook.
+- PayWay: ver `Guia-Integracion-PayWay.md` (tokenizacion de tarjeta en el frontend, cobro server-side con el token).
 
 ### 9.2 Correo Argentino - API PaqAr
 
-**Estado:** En espera de usuario y clave API de produccion.
+**Estado:** Reemplazado por un sistema propio de reglas de envio (08/07/2026). Ya no es una dependencia externa en espera.
 
-El servicio `CorreoArgentinoService` ya esta implementado y funcional en modo sandbox. La cotizacion de envio ya funciona en el detalle de producto.
+No se pudieron conseguir las credenciales de la API PaqAr. En su lugar, el presidente/admin configura el costo de envio desde el Dashboard (seccion **"Envios"**): por categoria (aplicable a todos los artesanos de esa categoria, o a uno especifico como override) y por uno de 4 modos: monto fijo, por provincia, por peso, o "a coordinar" (el artesano se comunica directamente). Ver seccion 12 para los endpoints nuevos.
 
-Una vez recibidas las credenciales de produccion:
-- Configurar variables de entorno (`CORREO_ARGENTINO_API_KEY`, `CORREO_ARGENTINO_AGREEMENT`)
-- Cambiar `CORREO_ARGENTINO_SANDBOX=false`
-- Testear con datos reales
+El servicio `CorreoArgentinoService` sigue en el codigo (sin uso) por si en el futuro se retoma la integracion con credenciales reales; ya no se llama desde `ProductController` ni desde `OrderController@checkout`.
 
 ---
 
@@ -518,12 +513,11 @@ GET    /api/artisans/{id}             Detalle de artesano
 GET    /api/products                  Listar productos (filtros: category_id, featured)
 GET    /api/products/{slug}           Detalle de producto
 
-POST   /api/shipping-rates            Cotizar envio (Correo Argentino)
-
 GET    /api/cart                      Ver carrito
 POST   /api/cart                      Agregar producto al carrito
 PUT    /api/cart/{itemId}             Actualizar cantidad
 DELETE /api/cart/{itemId}             Eliminar item del carrito
+POST   /api/cart/shipping-quote       Cotizar envio del carrito (reglas propias, agrupado por artesano)
 ```
 
 ### Autenticados (requieren token)
@@ -557,6 +551,13 @@ DELETE /api/products/{id}             Eliminar producto
 
 GET    /api/admin/clients             Listar clientes
 GET    /api/admin/clients/{id}        Detalle de cliente
+
+PATCH  /api/orders/{id}/status        Cambiar estado de orden
+
+GET    /api/admin/shipping-rules      Listar reglas de envio
+POST   /api/admin/shipping-rules      Crear regla (categoria + todos/artesano especifico + modo)
+PUT    /api/admin/shipping-rules/{id} Editar regla
+DELETE /api/admin/shipping-rules/{id} Eliminar regla
 ```
 
 ### Endpoints que faltan por crear
@@ -580,8 +581,8 @@ POST   /api/contact                   Enviar formulario de contacto
 3. **Gestion de estados de orden (admin)** - Endpoint + UI para cambiar estado de pedidos
 4. **Emails transaccionales** - Confirmacion de pedido (con datos del artesano), notificacion al artesano de nuevo pedido
 5. **Recuperar contrasena** - Flujo completo (email + reset)
-6. **Integracion PayWay** - Cuando lleguen las credenciales
-7. **Integracion Correo Argentino produccion** - Cuando lleguen las credenciales
+6. ~~Integracion PayWay~~ - Resuelto temporalmente con "pago a coordinar" (08/07/2026); PayWay/MercadoPago quedan para cuando haya credenciales
+7. ~~Integracion Correo Argentino produccion~~ - Reemplazado por reglas de envio propias por categoria/artesano (08/07/2026); Correo Argentino queda para cuando haya credenciales
 
 ### Fase 2 - Experiencia completa
 

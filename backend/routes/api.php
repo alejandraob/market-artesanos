@@ -11,6 +11,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ShippingRuleController;
 
 // Public Endpoints
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
@@ -29,13 +30,13 @@ Route::get('/artisans/{id}', [ArtisanController::class, 'show']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{identifier}', [ProductController::class, 'show']);
-Route::post('/shipping-rates', [ProductController::class, 'shippingRates']);
 
 // Cart endpoints (auth optional)
 Route::get('/cart', [CartController::class, 'index']);
 Route::post('/cart', [CartController::class, 'store']);
 Route::put('/cart/{itemId}', [CartController::class, 'update']);
 Route::delete('/cart/{itemId}', [CartController::class, 'destroy']);
+Route::post('/cart/shipping-quote', [CartController::class, 'shippingQuote']);
 
 // Authenticated Endpoints
 Route::middleware('auth:sanctum')->group(function () {
@@ -70,6 +71,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/admin/clients/{id}', [ClientController::class, 'show']);
 
         Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus']);
+
+        Route::get('/admin/shipping-rules', [ShippingRuleController::class, 'index']);
+        Route::post('/admin/shipping-rules', [ShippingRuleController::class, 'store']);
+        Route::put('/admin/shipping-rules/{shippingRule}', [ShippingRuleController::class, 'update']);
+        Route::delete('/admin/shipping-rules/{shippingRule}', [ShippingRuleController::class, 'destroy']);
     });
 
     // Client/Order routes

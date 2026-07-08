@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Services\ShippingCalculatorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -74,5 +75,20 @@ class CartController extends Controller
         $cart = $this->getCart($request);
         CartItem::where('cart_id', $cart->id)->findOrFail($itemId)->delete();
         return response()->json(null, 204);
+    }
+
+    public function shippingQuote(Request $request, ShippingCalculatorService $calculator)
+    {
+        $request->validate(['shipping_province' => 'required|string|max:255']);
+
+        $cart = $this->getCart($request);
+        $items = $cart->items()->with(['product.category', 'product.artisan.user'])->get()
+                      ->filter(fn($i) => $i->product !== null)->values();
+
+        if ($items->isEmpty()) {
+            return response()->json(['message' => 'Carrito vacío'], 400);
+        }
+
+        return response()->json($calculator->calculate($items, $request->shipping_province));
     }
 }
