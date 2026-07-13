@@ -203,3 +203,31 @@ Auditoria realizada el 26/03/2026. Estado de los hallazgos y acciones tomadas.
 13. SEC-15: Validar formato de codigo postal
 14. SEC-17: Completar validacion MIME de fotos
 15. SEC-20: Implementar audit logging
+
+---
+
+## Revision 13/07/2026 - Sistema de envio y pago a coordinar
+
+Se revisaron los hallazgos SEC-01 a SEC-21 contra el codigo actual: **siguen vigentes sin regresiones** (CORS, Sanctum, rate limiting de auth intactos). Se detectaron 4 hallazgos nuevos en el codigo agregado el 08/07/2026 (reglas de envio por categoria/artesano, checkout con pago a coordinar).
+
+### SEC-22: Envio "por zona" podia quedar en $0 con una provincia no configurada (MEDIO-ALTO)
+
+**Ubicacion:** `CartController::shippingQuote`, `OrderController::checkout`, `ShippingCalculatorService::calculateGroupCost` (caso `zone`).
+**Problema:** `shipping_province` no se validaba contra una lista fija. Si se mandaba una provincia inventada por API (sin pasar por el `<select>` del frontend) y la regla de esa categoria no tenia cargado el precio "por defecto" (`_default`, campo opcional), el costo de envio caia a `$0` — tanto en la cotizacion como en el pedido real.
+**Solucion:** Nuevo `backend/config/argentina.php` con la lista de 24 provincias, usada con `Rule::in()` (via `in:`) en ambos endpoints. Ademas, `_default` ahora es **obligatorio** al guardar una regla en modo `zone` (`ShippingRuleController::validateRule` + input marcado `required` en el Dashboard).
+**Estado:** CORREGIDO (13/07/2026)
+
+### SEC-23: Sin throttle propio en `/cart/shipping-quote` y `/orders/checkout` (BAJO-MEDIO)
+
+**Problema:** Dependen solo del limiter global de 60 req/min. `checkout` ademas dispara emails sincronos (`QUEUE_CONNECTION=sync`) por cada pedido, con riesgo de saturar la cuenta de Gmail remitente ante un pico de pedidos.
+**Estado:** Pendiente
+
+### SEC-24: Pedidos `pending` ilimitados sin gateway de pago (BAJO - riesgo de negocio)
+
+**Problema:** Sin PayWay/MercadoPago, cualquier usuario autenticado con email verificado puede crear pedidos `pending` sin limite ni control de pago real. Riesgo aceptado mientras dure el flujo de "pago a coordinar" (ver `Registro-de-Avances.md` seccion 4.2), pero conviene sumar throttle especifico y/o un limite de pedidos pendientes simultaneos por usuario.
+**Estado:** Riesgo aceptado (temporal)
+
+### SEC-25: Credenciales y servicio de Correo Argentino sin uso (INFORMATIVO)
+
+**Problema:** `CorreoArgentinoService` y las variables `CORREO_ARGENTINO_*` en `.env` quedaron huerfanas tras reemplazar la cotizacion por el sistema de reglas propio (ver seccion 9.2 de `Estado-del-Proyecto.md`). No es una vulnerabilidad activa (sandbox, `.env` no commiteado), es limpieza pendiente.
+**Estado:** Pendiente (limpieza, no bloqueante)

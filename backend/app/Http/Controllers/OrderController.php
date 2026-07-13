@@ -41,7 +41,7 @@ class OrderController extends Controller
             'shipping_name' => 'required|string|max:255',
             'shipping_address' => 'required|string|max:255',
             'shipping_city' => 'required|string|max:255',
-            'shipping_province' => 'required|string|max:255',
+            'shipping_province' => 'required|string|in:' . implode(',', config('argentina.provincias')),
             'shipping_postal_code' => 'required|string|max:10',
             'shipping_phone' => 'required|string|max:20',
         ]);

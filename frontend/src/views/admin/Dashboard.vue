@@ -506,9 +506,10 @@
               </div>
             </div>
             <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-              <span class="text-xs font-bold text-gray-500 w-24 shrink-0">Por defecto</span>
-              <input v-model.number="shippingRuleForm.shipping_zone_rates._default" type="number" step="0.01" min="0" class="input-field text-sm py-1.5" placeholder="$" />
+              <span class="text-xs font-bold text-gray-500 w-24 shrink-0">Por defecto *</span>
+              <input v-model.number="shippingRuleForm.shipping_zone_rates._default" type="number" step="0.01" min="0" class="input-field text-sm py-1.5" placeholder="$" required />
             </div>
+            <p class="text-xs text-gray-400">* Obligatorio: se usa para cualquier provincia que no tenga un precio especifico cargado arriba.</p>
           </div>
 
           <div v-if="shippingRuleForm.shipping_mode === 'weight'" class="grid grid-cols-2 gap-4">

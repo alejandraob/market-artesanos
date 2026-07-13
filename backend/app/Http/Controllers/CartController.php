@@ -79,7 +79,9 @@ class CartController extends Controller
 
     public function shippingQuote(Request $request, ShippingCalculatorService $calculator)
     {
-        $request->validate(['shipping_province' => 'required|string|max:255']);
+        $request->validate([
+            'shipping_province' => 'required|string|in:' . implode(',', config('argentina.provincias')),
+        ]);
 
         $cart = $this->getCart($request);
         $items = $cart->items()->with(['product.category', 'product.artisan.user'])->get()

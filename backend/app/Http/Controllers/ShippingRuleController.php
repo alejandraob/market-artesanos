@@ -68,6 +68,7 @@ class ShippingRuleController extends Controller
             'shipping_mode' => 'required|in:coordination,flat,zone,weight',
             'shipping_flat_price' => 'required_if:shipping_mode,flat|nullable|numeric|min:0',
             'shipping_zone_rates' => 'required_if:shipping_mode,zone|nullable|array',
+            'shipping_zone_rates._default' => 'required_if:shipping_mode,zone|numeric|min:0',
             'shipping_weight_base' => 'required_if:shipping_mode,weight|nullable|numeric|min:0',
             'shipping_weight_rate' => 'required_if:shipping_mode,weight|nullable|numeric|min:0',
         ]);
