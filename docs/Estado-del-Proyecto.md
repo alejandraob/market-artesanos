@@ -310,6 +310,17 @@ El campo `stock` existe en la tabla `products` pero segun el modelo de negocio n
 - Ignorarlo y dejarlo en 0/null
 - Eliminarlo con una migracion para evitar confusiones futuras
 
+### 8.5 Sin backup automatico de base de datos ni imagenes
+
+**Estado:** Diagnosticado (13/07/2026), pendiente de implementar.
+
+No existe ningun backup automatico ni de la base de datos MySQL ni de `backend/storage/app/public` (imagenes de productos/artesanos), en local ni en produccion. `Guia-Actualizar-Sitio-Produccion.md` solo tiene un paso manual antes de cada deploy. Ya paso una vez que se perdio la carpeta de imagenes al reinstalar XAMPP (ver `Registro-de-Avances.md` seccion 4.3) y se recupero por suerte desde una instalacion vieja.
+
+El volumen de datos hoy es minimo (~2.4 MB de imagenes), asi que cualquier solucion es viable sin friccion de costo/tiempo. Opciones evaluadas:
+- Script propio (`mysqldump` + copia de `storage/app/public`) programado por cron/Task Scheduler, subiendo a un destino externo (otra carpeta, Drive, bucket barato)
+- Paquete `spatie/laravel-backup`: un solo comando artisan respalda BD + archivos a un disco remoto, con rotacion automatica
+- Backup nativo del hosting si se contrata un plan que lo incluya
+
 ---
 
 ## 9. Dependencias externas en espera

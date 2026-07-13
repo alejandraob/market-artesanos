@@ -54,6 +54,11 @@ El proyecto sigue una arquitectura **API-first** con separacion completa entre b
 | uuid | ^13.0 | Generacion de IDs unicos (sesion de carrito) |
 | @mercadopago/sdk-js | ^0.0.3 | SDK frontend de Mercado Pago |
 
+### Testing
+| Paquete | Version | Funcion |
+|---------|---------|---------|
+| @playwright/test | ^1.x | Verificacion end-to-end en navegador real (Chromium) de flujos como login, carrito y checkout |
+
 ### Estilos
 | Componente | Version | Descripcion |
 |------------|---------|-------------|

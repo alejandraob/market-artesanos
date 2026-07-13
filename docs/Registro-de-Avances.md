@@ -398,3 +398,24 @@ Se agregaron avisos de "Coordinacion de pago" en `Checkout.vue`, `OrderConfirmat
 ### 4.3 Recuperacion del entorno local (incidente, no relacionado con lo anterior)
 
 Durante esta sesion se detecto que, tras una reinstalacion de XAMPP, `backend/.env` habia vuelto a valores de fabrica (`DB_DATABASE=laravel`, mail a `mailpit`, URLs de una IP vieja) y faltaban las carpetas de `storage/` (sin imagenes, sin symlink publico). Se recupero la base `market_artesanos` real y las imagenes de productos/artesanos desde un respaldo de la instalacion anterior de XAMPP, se recrearon las carpetas de `storage` y el symlink, y se corrigieron ambos `.env` (backend y frontend).
+
+---
+
+## Fase 5 - Verificacion end-to-end y revision de seguridad/performance/backup (13/07/2026)
+
+### 5.1 Playwright para verificacion end-to-end (COMPLETADO)
+
+Se instalo `@playwright/test` (Chromium) en el frontend para poder recorrer flujos reales del sitio (login, catalogo, carrito, checkout, confirmacion, panel admin) de forma automatizada en vez de depender solo de pruebas manuales. Se corrio el flujo completo de checkout con productos de 2 artesanos distintos (uno con regla de envio calculable, otro con envio por peso) y se confirmo: desglose de envio por artesano correcto, total correcto, pantalla de confirmacion con datos del artesano y aviso de coordinacion de pago, 0 errores de consola. Tambien se reviso visualmente la seccion "Envios" del Dashboard (listado y modal de nueva regla).
+
+**Archivos modificados:** `frontend/package.json`, `frontend/package-lock.json`, `frontend/.gitignore` (carpetas de salida de Playwright)
+
+### 5.2 Revision de seguridad, performance y backup de imagenes (COMPLETADO el diagnostico; SEC-22 corregido)
+
+Se reviso el estado actual en 3 frentes:
+
+- **Seguridad:** los 21 hallazgos de `Auditoria-Seguridad.md` (26/03/2026) siguen vigentes sin regresiones. Se detectaron 4 hallazgos nuevos en el sistema de envio/pago agregado el 08/07/2026 (SEC-22 a SEC-25, ver `Auditoria-Seguridad.md`). **SEC-22 corregido en esta sesion**: el envio "por zona" podia quedar en $0 si se mandaba una provincia inventada por API y la regla no tenia cargado el precio "por defecto". Se agrego `backend/config/argentina.php` con la lista fija de provincias (validada con `in:` en `/cart/shipping-quote` y `/orders/checkout`) y se hizo obligatorio el campo "por defecto" al guardar una regla en modo zona. SEC-23 (sin throttle propio en checkout/shipping-quote), SEC-24 (pedidos ilimitados sin gateway de pago) y SEC-25 (limpieza de credenciales de Correo Argentino sin uso) quedan pendientes/aceptados.
+- **Performance:** medido con Playwright en vez de Lighthouse. El build de produccion reduce el peso por pagina de ~1.4-1.7 MB (modo dev) a ~11-79 KB, confirmando lo que ya proyectaba la auditoria vieja. No se encontraron regresiones nuevas.
+- **Backup de imagenes/base de datos:** diagnostico confirmado: **no existe ningun backup automatico** hoy, ni de `storage/app/public` ni de la base de datos, en local ni en produccion (la guia de deploy solo tiene un paso manual antes de actualizar el sitio). El volumen de datos es minimo (~2.4 MB), por lo que cualquier solucion (script + cron/Task Scheduler, o `spatie/laravel-backup`) es viable sin friccion de costo. Queda pendiente de decidir e implementar.
+
+**Archivos creados:** `backend/config/argentina.php`
+**Archivos modificados:** `CartController.php`, `OrderController.php`, `ShippingRuleController.php`, `Dashboard.vue`, `docs/Auditoria-Seguridad.md`
