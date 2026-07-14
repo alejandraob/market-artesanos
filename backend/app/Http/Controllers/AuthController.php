@@ -201,7 +201,8 @@ class AuthController extends Controller
             return response()->json(['message' => 'El email ya fue verificado.']);
         }
 
-        $user->update(['email_verified_at' => now()]);
+        $user->email_verified_at = now();
+        $user->save();
         DB::table('password_reset_tokens')->where('email', 'verify_' . $user->email)->delete();
 
         return response()->json(['message' => 'Email verificado correctamente.']);

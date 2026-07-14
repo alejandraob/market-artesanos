@@ -65,3 +65,5 @@ correoargentino/vendor/
 
 # Base de datos
 /market_artesanos.sql
+backup_*.sql
+backup_storage_*/
